@@ -1,11 +1,11 @@
-import pydantic import BaseModel
-import datetime from date 
+from pydantic import BaseModel
+from datetime import date 
 
 class signup(BaseModel):
     username: str
     email: str
     password: str
 
-class login(Basemodel):
+class login(BaseModel):
     username: str
     password: str

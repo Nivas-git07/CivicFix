@@ -5,6 +5,6 @@ def db_connection():
         host = "172.30.20.187",
         user = "nivas",
         password = "spidey",
-        db_name = "product"
+        dbname = "product"
        
 )

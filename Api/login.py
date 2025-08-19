@@ -1,8 +1,8 @@
-from api.db from db_connection
+from Api.db import db_connection
 from fastapi import APIRouter
 import psycopg2
 from pydantic import BaseModel
-from api.basemodel import login
+from Api.basemodel import login
 from fastapi import FastAPI, Response, HTTPException, Request, Depends
 
 load = APIRouter()
