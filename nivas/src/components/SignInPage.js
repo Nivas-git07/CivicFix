@@ -1,16 +1,45 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./SignInPage.css"; // Import the CSS file
 
-export default function SignInPage() {
+function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Email:", email);
-    console.log("Password:", password);
-    // Add login logic here
+
+    try {
+     
+      const response = await fetch("http://127.0.0.1:8000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        
+        console.log("Login Success:", data);
+
+        
+        localStorage.setItem("user", JSON.stringify(data));
+
+       
+        navigate("/dashboard");
+      } else {
+        // ❌ Login failed
+        setError(data.message || "Invalid email or password");
+      }
+    } catch (err) {
+      console.error("Error logging in:", err);
+      setError("Something went wrong. Please try again later.");
+    }
   };
 
   return (
@@ -76,3 +105,5 @@ export default function SignInPage() {
     </div>
   );
 }
+
+export default SignInPage;

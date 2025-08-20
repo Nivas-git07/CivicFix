@@ -18,11 +18,11 @@ export default function RegisterPage() {
   e.preventDefault();
 
   try {
-    const response = await fetch('http://localhost:3005/create', {
+    const response = await fetch('http://127.0.0.1:8000/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        name: formData.fullName,
+        username: formData.fullName,
         email: formData.email,
         district:formData.district,
         password: formData.password,
