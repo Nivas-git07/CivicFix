@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { NavLink } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 import "./ReportForm.css";
 import logo from "./image.png";
 
@@ -27,15 +28,17 @@ const ReportForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
+    const uniqid=uuidv4();
 
     const formData = new FormData();
+    formData.append("id",uniqid);
     formData.append("issueType", issueType);
     formData.append("photo", photoFile);
     formData.append("location", location);
     formData.append("description", description);
 
     try {
-      const response = await fetch("/api/report", {
+      const response = await fetch("http://localhost:5000/api/report", {
         method: "POST",
         body: formData,
       });

@@ -6,13 +6,14 @@ import { BrowserRouter } from "react-router-dom";
 import reportWebVitals from './reportWebVitals';
 import SignInPage from './components/SignInPage';
 import ReportForm from './components/ReportForm';
+import ProfileDashboard from './components/ProfileDashboard';
 
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <BrowserRouter>
-    <ReportForm/>
+    <ProfileDashboard/>
   </BrowserRouter>
   
 );
