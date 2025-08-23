@@ -1,0 +1,229 @@
+/* Layout & Container */
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: sans-serif;
+  color: #333;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+}
+
+.brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.nav-links a,
+.icon-button {
+  margin-left: 1rem;
+  text-decoration: none;
+  color: #555;
+  font-size: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.nav-links a:hover,
+.icon-button:hover {
+  color: #000;
+}
+
+/* Profile Card */
+.profile-card {
+  display: flex;
+  align-items: center;
+  background: #f8f8f8;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-right: 20px;
+  object-fit: cover;
+}
+
+.profile-info h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.profile-info p {
+  margin: 5px 0 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.profile-actions {
+  margin-left: auto;
+  text-align: right;
+}
+
+.reputation {
+  display: inline-block;
+  font-size: 1rem;
+  margin-right: 20px;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.edit-button {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  border: 1px solid #333;
+  background: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.edit-button:hover {
+  background: #333;
+  color: white;
+}
+
+/* Stats Cards */
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.stat-card {
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+.stat-label {
+  display: block;
+  color: #999;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Reports Section */
+.reports-section h3 {
+  margin: 20px 0 10px;
+  font-size: 1.25rem;
+}
+
+/* Default color for all stat values */
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.stat-label {
+  color: black;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+/* Total Reports in black */
+.value-total {
+  color: black;
+}
+
+/* Resolved in green */
+.value-resolved {
+  color: green;
+}
+
+/* Other statuses: customize as needed */
+.value-progress {
+  color: rgb(185, 193, 78);
+}
+
+.value-default {
+  color: red;
+}
+.profile-actions {
+  display: flex;
+  align-items: center;   /* vertically center */
+  justify-content: flex-end; /* push everything to the right */
+  gap: 30px; /* space between reputation and button */
+}
+
+/* Reputation box */
+.reputation-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 80px; /* keeps it stable */
+}
+
+/* Score row */
+.reputation-score {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: bold;
+  font-size: 18px;
+  color: #000;
+}
+
+.rep-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.rep-value {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.rep-label {
+  font-size: 13px;
+  color: #555;
+  margin-top: 2px;
+  text-align: center;
+}
+
+/* Edit button */
+.edit-button {
+  padding: 6px 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.edit-button:hover {
+  background: #000000;
+  color: #fff;
+
+}

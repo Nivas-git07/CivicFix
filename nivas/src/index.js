@@ -5,6 +5,9 @@ import App from './App';
 import { BrowserRouter } from "react-router-dom";
 import reportWebVitals from './reportWebVitals';
 import SignInPage from './components/SignInPage';
+import RegisterPage from './components/RegisterPage';
+import ProfileDashboard from './components/ProfileDashboard';
+import ReportForm from './components/ReportForm';
 
 
 
@@ -12,7 +15,11 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <BrowserRouter>
     <App />
-    <SignInPage/>
+    <ProfileDashboard/>
+    {/* <ReportForm/> */}
+    {/* <SignInPage/>
+    <RegisterPage/> */}
+    
   </BrowserRouter>
   
 );
