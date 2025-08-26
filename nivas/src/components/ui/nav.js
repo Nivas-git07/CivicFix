@@ -1,37 +1,36 @@
 import React from "react";
 import { Bell } from "lucide-react"; // notification icon
+import { User } from "lucide-react"; // user icon
+import { MapPin } from "lucide-react"; // map pin icon
+import "../css/home.css"
 
 function Navbar() {
   return (
-    <nav className="flex items-center justify-between bg-white shadow px-6 py-3">
-      {/* Left Logo */}
-      <div className="flex items-center space-x-2">
-        <span className="text-2xl">📍</span>
-        <span className="text-xl font-semibold">CivicFix</span>
-      </div>
+    <header class="bg-white border-b border-gray-200">
+      <div class="max-w-7xl mx-auto px-4 sm-px-6 lg-px-8">
+        <div class="flex justify-between items-center h-16">
 
-      {/* Center Menu */}
-      <div className="flex space-x-8 text-gray-800 font-medium">
-        <a href="/home" className="hover:text-blue-600">
-          Home
-        </a>
-        <a href="/report" className="hover:text-blue-600">
-          Report
-        </a>
-        <a href="/complaints" className="hover:text-blue-600">
-          My Complaints
-        </a>
-        <a href="/profile" className="font-bold text-black border-b-2 border-black">
-          Profile
-        </a>
-      </div>
+          <div class="flex items-center space-x-2">
+            <div class="logo-circle">
+              <div class="logo-inner-circle"></div>
+            </div>
+            <span class="logo-text">CivicFix</span>
+          </div>
 
-      {/* Right Notifications */}
-      <div className="relative">
-        <Bell className="w-6 h-6 text-gray-700" />
-        <span className="absolute top-0 right-0 inline-flex w-2 h-2 bg-red-500 rounded-full"></span>
+
+          <nav class="nav-desktop">
+            <a href="#" class="nav-link active">Home</a>
+            <a href="#" class="nav-link">Report</a>
+            <a href="#" class="nav-link">My Complaints</a>
+            <a href="#" class="nav-link">Map View</a>
+            <a href="#" class="nav-link">Profile</a>
+            <a href="#" class="nav-link">Login</a>
+            <a href="#" class="nav-link">Register</a>
+          </nav>
+        </div>
       </div>
-    </nav>
+    </header>
+
   );
 }
 

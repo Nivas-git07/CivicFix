@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./RegisterPage.css"; // Import CSS
-import Navbar from "./ui/nav";
+import Navbar from "../components/ui/nav";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({

@@ -196,11 +196,13 @@
 .rep-icon {
   width: 18px;
   height: 18px;
+  margin-left: -5px;
 }
 
 .rep-value {
   font-size: 18px;
   font-weight: bold;
+  margin-left: -5px;
 }
 
 .rep-label {
@@ -226,4 +228,7 @@
   background: #000000;
   color: #fff;
 
+}
+.reputation-box {
+  margin-top: 23px;
 }

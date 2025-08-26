@@ -59,7 +59,7 @@
 import React from "react";
 import "./ProfileDashboard.css";
 import avatarImg from "./avatar.png";
-import Navbar from "./ui/nav";
+import Navbar from "../components/ui/nav";
 import { Award } from "lucide-react";
 
 const stats = [
