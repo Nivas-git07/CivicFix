@@ -1,8 +1,9 @@
 import React from "react";
-import { Bell } from "lucide-react"; // notification icon
-import { User } from "lucide-react"; // user icon
-import { MapPin } from "lucide-react"; // map pin icon
+// import { Bell } from "lucide-react"; // notification icon
+// import { User } from "lucide-react"; // user icon
+// import { MapPin } from "lucide-react"; // map pin icon
 import "../css/home.css"
+import { Link } from "react-router-dom";
 
 function Navbar() {
   return (
@@ -19,13 +20,13 @@ function Navbar() {
 
 
           <nav class="nav-desktop">
-            <a href="#" class="nav-link active">Home</a>
-            <a href="#" class="nav-link">Report</a>
-            <a href="#" class="nav-link">My Complaints</a>
-            <a href="#" class="nav-link">Map View</a>
-            <a href="#" class="nav-link">Profile</a>
-            <a href="#" class="nav-link">Login</a>
-            <a href="#" class="nav-link">Register</a>
+            <Link to="/home" className="nav-link active">Home</Link>
+            <Link to="/report" className="nav-link">Report</Link>
+            <Link to="/complaints" className="nav-link">My Complaints</Link>
+            <Link to="/map" className="nav-link">Map View</Link>
+            <Link to="/profile" className="nav-link">Profile</Link>
+            <Link to="/login" className="nav-link">Login</Link>
+            <Link to="/register" className="nav-link">Register</Link>
           </nav>
         </div>
       </div>

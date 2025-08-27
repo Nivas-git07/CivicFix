@@ -57,8 +57,8 @@
 // }
 
 import React from "react";
-import "./ProfileDashboard.css";
-import avatarImg from "./avatar.png";
+import "../components/css/ProfileDashboard.css"; // Connects the CSS below
+import avatarImg from "../components/image/avatar.png";
 import Navbar from "../components/ui/nav";
 import { Award } from "lucide-react";
 

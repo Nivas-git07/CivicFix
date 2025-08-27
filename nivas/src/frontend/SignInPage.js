@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "./SignInPage.css"; // Import the CSS file
+import "../components/css/SignInPage.css"; // Import CSS
 
 function SignInPage() {
   const [email, setEmail] = useState("");

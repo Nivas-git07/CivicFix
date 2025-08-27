@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import "./RegisterPage.css"; // Import CSS
+import "../components/css/RegisterPage.css"; // Import CSS
 import Navbar from "../components/ui/nav";
 
 export default function RegisterPage() {

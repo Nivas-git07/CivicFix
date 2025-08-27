@@ -1,8 +1,8 @@
 import React, { useState, useRef } from "react";
 import { NavLink } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import "./ReportForm.css";
-import  "..components/image/image.png";
+import "../components/css/ReportForm.css";
+import  "../components/image/image.png";
 import Navbar from "../components/ui/nav";
 
 const ReportForm = () => {

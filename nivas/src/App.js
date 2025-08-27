@@ -1,16 +1,19 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import SignInPage from "./components/SignInPage";
-import RegisterPage from "./components/RegisterPage";
-import ProfileDashboard from "./components/ProfileDashboard";
-import ReportForm from "./components/ReportForm";
+import SignInPage from "./frontend/SignInPage";
+import RegisterPage from "./frontend/RegisterPage";
+import ProfileDashboard from "./frontend/ProfileDashboard";
+import ReportForm from "./frontend/ReportForm";
+import Home from "./frontend/home";
 
 function App() {
   return (
     <Routes>
-      {/* <Route path="/" element={<SignInPage />} />
+      <Route path="/" element={<SignInPage />} />
       <Route path="/register" element={<RegisterPage />} />
-       <Route path="/dashboard" element={<ProfileDashboard />} /> */}
-      <Route path="/report" element={<ReportForm />} />
+      <Route path="/login" element={<SignInPage />} />
+      <Route path="/home" element={<Home />} />
+      {/* <Route path="/dashboard" element={<ProfileDashboard />} /> */}
+      {/* <Route path="/report" element={<ReportForm />} /> */}
     </Routes>
   );
 }
