@@ -12,6 +12,7 @@ const ReportForm = () => {
   const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [fileName, setFileName] = useState("No file selected");
+  const [time, settime] = useState("")
 
   const fileInputRef = useRef(null);
 
@@ -27,6 +28,21 @@ const ReportForm = () => {
   };
 
   const handleSubmit = async (e) => {
+    const now = new Date();
+     const options = {
+      timeZone: "Asia/Kolkata",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true, // AM/PM
+    };
+
+    const formatted = now.toLocaleString("en-IN", options);
+    settime(formatted);
+
     e.preventDefault();
     setSubmitting(true);
     const uniqid=uuidv4();
@@ -37,7 +53,7 @@ const ReportForm = () => {
     formData.append("photo", photoFile);
     formData.append("location", location);
     formData.append("description", description);
-
+    formData.append("time", formatted);
     try {
       const response = await fetch("http://localhost:5000/api/report", {
         method: "POST",
