@@ -77,7 +77,7 @@ app.post("/api/report", upload.single("photo"), async (req, res) => {
 
     await pool.query(
       `INSERT INTO complaint
-       (complaint_id,issue_type, photo, location, description)
+       (complaint_id,title,image, location, description)
        VALUES ($1,$2,$3,$4,$5)`,
       [complaintId, issueType, photo, location, description]
     );
