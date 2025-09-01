@@ -13,7 +13,7 @@ function App() {
       <Route path="/login" element={<SignInPage />} />
       <Route path="/home" element={<Home />} />
       {/* <Route path="/dashboard" element={<ProfileDashboard />} /> */}
-      {/* <Route path="/report" element={<ReportForm />} /> */}
+      <Route path="/report" element={<ReportForm />} />
     </Routes>
   );
 }
