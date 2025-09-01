@@ -13,7 +13,6 @@ load = APIRouter()
 @load.post("/signup")
 async def signup_user(user: signup):
     #  print(user.dict()) 
-    
     conn = db_connection()
     cursor = conn.cursor()
     try:
