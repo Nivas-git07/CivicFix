@@ -1,5 +1,6 @@
 function Content({ status, counter, title, discription, location, time, upvotes, disvotes, comment, issueid, image }) {
     return (
+         
         <div class="issue-card">
             <div class="issue-image-container">
                 <img
@@ -67,6 +68,7 @@ function Content({ status, counter, title, discription, location, time, upvotes,
                 </div>
             </div>
         </div>
+        
     )
 }
 export default Content;

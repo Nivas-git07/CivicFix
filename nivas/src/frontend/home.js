@@ -33,7 +33,7 @@ export default function Home() {
             <main class="max-w-7xl mx-auto px-4 sm-px-6 lg-px-8 py-8">
                 <Search />
                 <Report />
-                <div className="grid gap-6">
+                <div class="issues-grid">
                     {complaints.map((c) => (
                         <Content
                             key={c.id}
@@ -57,3 +57,4 @@ export default function Home() {
 
     )
 }
+
