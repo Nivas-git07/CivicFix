@@ -1,9 +1,12 @@
-function Content({status,counter,title,discription,location,time,upvotes,disvotes,comment,issueid}) {
+function Content({ status, counter, title, discription, location, time, upvotes, disvotes, comment, issueid, image }) {
     return (
         <div class="issue-card">
             <div class="issue-image-container">
-                <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=250&fit=crop"
-                    alt="Broken streetlight at night" class="issue-image"></img>
+                <img
+                    src={image ? `data:image/png;base64,${image}` : "https://via.placeholder.com/400x250"}
+                    alt={title}
+                    className="issue-image"
+                />
                 <div class="status-badge progress">{status}</div>
                 <div class="image-counter">{counter}</div>
             </div>
