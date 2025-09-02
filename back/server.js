@@ -9,6 +9,7 @@ const PORT = 5000;
 
 
 
+
 // --- Check required environment variables ---
 const requiredEnv = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME'];
 requiredEnv.forEach((key) => {

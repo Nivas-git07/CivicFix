@@ -22,7 +22,9 @@ function SignInPage() {
       });
 
       const data = await response.json();
-
+      const token=data.token;
+      console.log("Token:",token);
+      localStorage.setItem("token",token);
       if (response.ok) {
         
         console.log("Login Success:", data);
