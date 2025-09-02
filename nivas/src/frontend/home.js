@@ -1,15 +1,29 @@
 import Navbar from "../components/ui/nav";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import "../components/css/home.css";
 import Banner from "../components/ui/banner";
 import Search from "../components/ui/search";
 import Report from "../components/ui/report";
+import { useState, useEffect } from "react";
 
 
 
 export default function Home() {
+    const [complaint, setComplaint] = useState("");
+    useEffect(() => {
+        fetch("http://localhost:5000/api/complaints")
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+                setComplaint(data);
+            })
+            .catch((error) => {
+                console.error("Error fetching complaints:", error);
+            });
+    }, []);
     return (
+        
         <div class="min-h-screen bg-gray-50">
             <Navbar />
             <Banner />
