@@ -8,6 +8,9 @@ const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET || "supersecret";
 const app = express();
 const PORT = 5000;  
+
+
+// --- Check required environment variables ---
 const pool = new Pool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
