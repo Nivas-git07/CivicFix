@@ -22,7 +22,7 @@ function Navbar() {
           <nav class="nav-desktop">
             <Link to="/home" className="nav-link active">Home</Link>
             <Link to="/report" className="nav-link">Report</Link>
-            <Link to="/complaints" className="nav-link">My Complaints</Link>
+            <Link to="/getcomplaint" className="nav-link">My Complaints</Link>
             <Link to="/map" className="nav-link">Map View</Link>
             <Link to="/profile" className="nav-link">Profile</Link>
             <Link to="/login" className="nav-link">Login</Link>

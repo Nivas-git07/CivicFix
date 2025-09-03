@@ -4,6 +4,7 @@ import RegisterPage from "./frontend/RegisterPage";
 import ProfileDashboard from "./frontend/ProfileDashboard";
 import ReportForm from "./frontend/ReportForm";
 import Home from "./frontend/home";
+import TrackComplaint from "./frontend/getcomplaint";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Route path="/home" element={<Home />} />
       {/* <Route path="/dashboard" element={<ProfileDashboard />} /> */}
       <Route path="/report" element={<ReportForm />} />
+      <Route path="/getcomplaint" element={<TrackComplaint />} />
     </Routes>
   );
 }
