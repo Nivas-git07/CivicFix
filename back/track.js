@@ -22,20 +22,31 @@ pool.connect()
 router.get("/complaint_id/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        const result = await pool.query("SELECT * FROM complaint WHERE complaint_id=$1", [id]);
-        
+        const result = await pool.query(
+            "SELECT complaint_id, title, location, description, status, time, image FROM complaint WHERE complaint_id=$1",
+            [id]
+        );
+
         if (result.rows.length === 0) {
             return res.status(404).json({ error: "Complaint not found" });
         }
-        
+
         const complaint = result.rows[0];
+
+        // Convert image (bytea) to base64 if exists
+        let imageBase64 = null;
+        if (complaint.image) {
+            imageBase64 = complaint.image.toString("base64");
+        }
+
         res.json({
             complaint_id: complaint.complaint_id,
             title: complaint.title,
             location: complaint.location,
             description: complaint.description,
             status: complaint.status,
-            time: complaint.time
+            time: complaint.time,
+            image: imageBase64   // ✅ send image as base64
         });
 
     } catch (err) {
