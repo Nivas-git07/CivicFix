@@ -2,11 +2,6 @@ require('dotenv').config();
 const express = require('express');
 const { Pool } = require('pg');
 const router = express.Router();
-const app = express();
-const PORT = 5000;
-const cors = require('cors');
-
-app.use(cors({ origin: "http://localhost:3000" }));
 
 // --- Database connection ---
 const pool = new Pool({
@@ -17,15 +12,14 @@ const pool = new Pool({
     port: process.env.DB_PORT,
 });
 pool.connect()
-    .then(() => console.log('✅ Connected to PostgreSQL'))
+    .then(() => console.log("✅ Connected to PostgreSQL"))
     .catch((err) => {
-        console.error('❌ Database connection error:', err.message);
+        console.error("❌ Database connection error:", err.message);
         process.exit(1);
     });
-app.use(express.json());    
-app.use(express.urlencoded({ extended: true }));
+
 // --- API Routes ---
-app.get("/complaint_id/:id", async (req, res) => {
+router.get("/complaint_id/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const result = await pool.query("SELECT * FROM complaint WHERE complaint_id=$1", [id]);
@@ -50,6 +44,4 @@ app.get("/complaint_id/:id", async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+module.exports = router;
