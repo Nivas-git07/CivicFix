@@ -77,23 +77,30 @@ app.get('/api/profile', authenticateToken, async (req, res) => {
 const multer = require("multer");
 const upload = multer({ storage: multer.memoryStorage() });
 
+
 app.post("/api/profile/image", authenticateToken, upload.single("image"), async (req, res) => {
-    try {
-        const userId = req.user.id;
-        const imageBuffer = req.file.buffer;
+  try {
+    const userId = req.user.id;
 
-
-        await pool.query(
-            "UPDATE login SET image=$1 WHERE user_id=$2",
-            [imageBuffer, userId]
-        );
-
-        res.json({ message: "✅ Image updated", image: imageBuffer.toString("base64") });
-    } catch (err) {
-        console.error("❌ Error updating image:", err.message);
-        res.status(500).json({ error: "Server error" });
+    if (!req.file) {
+      return res.status(400).json({ error: "No image file uploaded" });
     }
+
+    const imageBuffer = req.file.buffer;
+
+    await pool.query(
+      "UPDATE login SET image = $1 WHERE user_id = $2",
+      [imageBuffer, userId]
+    );
+
+    res.json({ message: "✅ Image updated", image: imageBuffer.toString("base64") });
+  } catch (err) {
+    console.error("❌ Error updating image:", err.message);
+    res.status(500).json({ error: "Server error" });
+  }
 });
+
+
 
 app.listen(port, () => {
     console.log(`server running on port ${port}`);
