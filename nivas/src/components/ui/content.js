@@ -1,6 +1,6 @@
 function Content({ status, counter, title, discription, location, time, upvotes, disvotes, comment, issueid, image }) {
     return (
-         
+
         <div class="issue-card">
             <div class="issue-image-container">
                 <img
@@ -35,10 +35,8 @@ function Content({ status, counter, title, discription, location, time, upvotes,
                 <div class="issue-actions">
                     <div class="action-buttons">
                         <button class="action-btn">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M7 10v12l5-3 5 3V10"></path>
-                                <path d="M9 2h6a2 2 0 0 1 2 2v5l-3-2.5L11 9V4a2 2 0 0 1 2-2Z"></path>
-                            </svg>
+                            <i class="fas fa-thumbs-up text-sm">
+                            </i>
                             {upvotes}
                         </button>
                         <button class="action-btn">
@@ -68,7 +66,7 @@ function Content({ status, counter, title, discription, location, time, upvotes,
                 </div>
             </div>
         </div>
-        
+
     )
 }
 export default Content;
