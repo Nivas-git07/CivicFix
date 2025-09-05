@@ -27,7 +27,7 @@ export default function UserProfileCard() {
     if (!user) {
         return <p className="text-gray-500">Loading profile...</p>;
     }
-    const DEFAULT_AVATAR = "../image/default.jpg";
+    const DEFAULT_AVATAR = "https://i.pinimg.com/474x/98/1d/6b/981d6b2e0ccb5e968a0618c8d47671da.jpg?nii=t";
     const imageSrc = user.image
         ? `data:image/jpeg;base64,${user.image}`
         : DEFAULT_AVATAR;

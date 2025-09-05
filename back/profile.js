@@ -56,8 +56,8 @@ app.get('/api/profile', authenticateToken, async (req, res) => {
         }
         const user = result.rows[0];
         let imageBase64 = null;
-        if (user.image) {
-            imageBase64 = `data:image/jpeg;base64,${user.image.toString("base64")}`;
+         if (user.image) {
+            imageBase64 = user.image.toString("base64");
         }
 
         res.status(200).json({
