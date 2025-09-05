@@ -31,7 +31,7 @@ app.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // check if user exists
+    
     const result = await pool.query(
       "SELECT * FROM login WHERE email=$1",
       [email]
@@ -43,7 +43,7 @@ app.post("/api/login", async (req, res) => {
 
     const user = result.rows[0];
 
-    // compare password
+    
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
@@ -52,8 +52,8 @@ app.post("/api/login", async (req, res) => {
    const token = jwt.sign(
       { id: user.user_id, username: user.username, email: user.email },
       JWT_SECRET,
-      { expiresIn: "2h" }
-      );
+      { expiresIn:"2h"}
+    );
     res.json({ message: "✅ Login successful", token  });
   } catch (err) {
     console.error("❌ Error logging in:", err.message);

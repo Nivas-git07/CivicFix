@@ -18,7 +18,7 @@ pool.connect()
         process.exit(1);
     });
 
-// --- API Routes ---
+
 router.get("/complaint_id/:id", async (req, res) => {
     try {
         const { id } = req.params;
@@ -33,7 +33,7 @@ router.get("/complaint_id/:id", async (req, res) => {
 
         const complaint = result.rows[0];
 
-        // Convert image (bytea) to base64 if exists
+       
         let imageBase64 = null;
         if (complaint.image) {
             imageBase64 = complaint.image.toString("base64");
@@ -46,7 +46,7 @@ router.get("/complaint_id/:id", async (req, res) => {
             description: complaint.description,
             status: complaint.status,
             time: complaint.time,
-            image: imageBase64   // ✅ send image as base64
+            image: imageBase64   
         });
 
     } catch (err) {

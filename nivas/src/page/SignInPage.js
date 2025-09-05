@@ -23,6 +23,7 @@ function SignInPage() {
 
       const data = await response.json();
       const token=data.token;
+
       console.log("Token:",token);
       localStorage.setItem("token",token);
       if (response.ok) {
@@ -30,10 +31,11 @@ function SignInPage() {
         console.log("Login Success:", data);
 
         
-        localStorage.setItem("user", JSON.stringify(data));
+         localStorage.setItem("user", JSON.stringify(data.user));
+         console.log(data.user);
 
        
-        navigate("/dashboard");
+        navigate("/home");
       } else {
         // ❌ Login failed
         setError(data.message || "Invalid email or password");
