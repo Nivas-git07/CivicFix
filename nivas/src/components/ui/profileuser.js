@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import "../image/default.jpg";
 
 export default function UserProfileCard() {
     const [user, setUser] = useState(null);
@@ -17,7 +18,7 @@ export default function UserProfileCard() {
 
             .then((res) => res.json())
             .then((data) => {
-                console.log("Fetched user:", data); // ✅ correct place
+                console.log("Fetched user:", data); 
                 setUser(data);
             })
             .catch((err) => console.error("Error fetching user:", err));
@@ -26,16 +27,24 @@ export default function UserProfileCard() {
     if (!user) {
         return <p className="text-gray-500">Loading profile...</p>;
     }
+    const DEFAULT_AVATAR = "../image/default.jpg";
+    const imageSrc = user.image
+        ? `data:image/jpeg;base64,${user.image}`
+        : DEFAULT_AVATAR;
 
     return (
         <section className="border border-gray-300 shadow-md rounded-lg p-6 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-6 sm:space-y-0">
             <div className="flex items-center space-x-6">
                 <img
-                    src={user.image}
+                    src={imageSrc}
                     alt={`Portrait of ${user.name}`}
                     className="w-20 h-20 rounded-full object-cover"
                     width={80}
                     height={80}
+                    onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = DEFAULT_AVATAR;
+                    }}
                 />
                 <div>
                     <h2 className="font-semibold text-gray-900 text-xl leading-tight">

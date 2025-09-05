@@ -47,7 +47,7 @@ app.get('/api/profile', authenticateToken, async (req, res) => {
         const userId = req.user.id;
 
         const result = await pool.query(
-            "SELECT user_id, username, email,district,image FROM login WHERE user_id=$1",
+            "SELECT user_id, username, email,district,image,reputation FROM login WHERE user_id=$1",
             [userId]
         );
 
@@ -66,6 +66,7 @@ app.get('/api/profile', authenticateToken, async (req, res) => {
             email: user.email,
             district: user.district,
             image: imageBase64, 
+            reputation: user.reputation,
         });
 
        
