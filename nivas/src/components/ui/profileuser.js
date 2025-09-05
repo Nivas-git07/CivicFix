@@ -64,10 +64,45 @@ export default function UserProfileCard() {
                 </div>
                 <button
                     type="button"
+                    onClick={() => document.getElementById("profileImageInput").click()}
                     className="border border-black text-black text-sm rounded px-4 py-2 hover:bg-black hover:text-white focus:outline-none"
                 >
-                    Edit Profile
+                    Change Image
                 </button>
+
+                <input
+                    id="profileImageInput"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={async (e) => {
+                        const file = e.target.files[0];
+                        if (!file) return;
+
+                        const formData = new FormData();
+                        formData.append("image", file);
+
+                        try {
+                            const res = await fetch("http://localhost:5000/api/profile/image", {
+                                method: "POST",
+                                headers: {
+                                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                                },
+                                body: formData,
+                            });
+
+                            const data = await res.json();
+                            if (res.ok) {
+                                console.log("✅ Image uploaded:", data);
+                                setUser((prev) => ({ ...prev, image: data.image }));
+                            } else {
+                                console.error("❌ Upload failed:", data.error);
+                            }
+                        } catch (err) {
+                            console.error("❌ Error uploading image:", err);
+                        }
+                    }}
+                />
             </div>
         </section>
     );

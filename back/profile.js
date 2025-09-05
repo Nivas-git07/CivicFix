@@ -54,13 +54,47 @@ app.get('/api/profile', authenticateToken, async (req, res) => {
         if (result.rows.length === 0) {
             return res.status(404).json({ error: "User not found" });
         }
+        const user = result.rows[0];
+        let imageBase64 = null;
+        if (user.image) {
+            imageBase64 = `data:image/jpeg;base64,${user.image.toString("base64")}`;
+        }
 
-        res.status(200).json(result.rows[0]);
+        res.status(200).json({
+            user_id: user.user_id,
+            username: user.username,
+            email: user.email,
+            district: user.district,
+            image: imageBase64, 
+        });
+
+       
     } catch (err) {
         console.error("❌ Error fetching profile:", err.message);
         res.status(500).json({ error: "Server error" });
     }
 });
+const multer = require("multer");
+const upload = multer({ storage: multer.memoryStorage() });
+
+app.post("/api/profile/image", authenticateToken, upload.single("image"), async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const imageBuffer = req.file.buffer;
+
+
+        await pool.query(
+            "UPDATE login SET image=$1 WHERE user_id=$2",
+            [imageBuffer, userId]
+        );
+
+        res.json({ message: "✅ Image updated", image: imageBuffer.toString("base64") });
+    } catch (err) {
+        console.error("❌ Error updating image:", err.message);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
 app.listen(port, () => {
     console.log(`server running on port ${port}`);
 });
