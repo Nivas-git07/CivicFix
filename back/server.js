@@ -6,11 +6,13 @@ const cors = require('cors');
 const path = require('path');
 const app = express();
 const PORT = 5000;
+const JWT_SECRET = process.env.JWT_SECRET || "supersecret";
+const jwt = require("jsonwebtoken");
 
 
 
 
-// --- Check required environment variables ---
+
 const requiredEnv = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME'];
 requiredEnv.forEach((key) => {
   if (!process.env[key]) {
@@ -19,7 +21,7 @@ requiredEnv.forEach((key) => {
   }
 });
 
-// --- Database connection ---
+
 const pool = new Pool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -33,7 +35,23 @@ pool.connect()
     process.exit(1);
   });
 
-// --- Middleware ---
+app.use(express.json());
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+
+    if (!token) {
+        return res.status(401).json({ error: "No token provided" });
+    }
+
+    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(403).json({ error: "Invalid token" });
+        }
+        req.user = decoded;
+        next();
+    });
+};
 app.use(cors({ origin: "http://localhost:3000" }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -64,23 +82,29 @@ app.get('/api/health', (_req, res) => {
   res.json({ ok: true });
 });
 
-// Submit complaint
-app.post("/api/report", upload.single("photo"), async (req, res) => {
+app.post("/api/report", authenticateToken, upload.single("photo"), async (req, res) => {
   try {
-    const {  issueType, location, description } = req.body;
+    const { issueType, location, description } = req.body;
     const photo = req.file ? req.file.buffer : null;
 
-    if ( !issueType || !location || !description || !photo) {
+    if (!issueType || !location || !description || !photo) {
       return res.status(400).json({ error: 'All fields are required (including photo)' });
     }
+
+    const userId = req.user.id; // from authenticateToken middleware
 
     const complaintId = await generateUniqueComplaintId();
 
     await pool.query(
       `INSERT INTO complaint
-       (complaint_id,title,image, location, description)
-       VALUES ($1,$2,$3,$4,$5)`,
+       (complaint_id, title, image, location, description)
+       VALUES ($1, $2, $3, $4, $5)`,
       [complaintId, issueType, photo, location, description]
+    );
+
+    await pool.query(
+      `INSERT INTO login (user_id, complaint_id) VALUES ($1, $2)`,
+      [userId, complaintId]
     );
 
     res.status(201).json({ complaintId, message: 'Complaint submitted successfully' });
@@ -89,7 +113,6 @@ app.post("/api/report", upload.single("photo"), async (req, res) => {
     res.status(500).json({ error: 'Server error: ' + err.message });
   }
 });
-
 
 // Fetch complaint by ID
 app.get('/api/complaint/:id', async (req, res) => {
