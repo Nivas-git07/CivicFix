@@ -93,7 +93,7 @@ export default function ReportForm() {
       <Navbar />
 
       <div className="bg-transparent flex flex-col items-center px-4 py-10">
-        {/* Top Section */}
+      
         <h1 className="text-[#1B2430] font-extrabold text-2xl leading-7 text-center">
           Report Infrastructure Issue
         </h1>
@@ -102,13 +102,13 @@ export default function ReportForm() {
           input helps us prioritize repairs and maintenance.
         </p>
 
-        {/* Form */}
+        
         <form
           onSubmit={handleSubmit}
           autoComplete="off"
           className="bg-white mt-8 rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.1)] max-w-[600px] w-full p-6"
         >
-          {/* Issue Type */}
+    
           <label
             className="block text-[#374151] text-sm mb-1 font-normal"
             htmlFor="issueType"
@@ -125,7 +125,7 @@ export default function ReportForm() {
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-[#374151] text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
 
-          {/* Upload Photo */}
+        
           <label
             className="block text-[#374151] text-sm mt-6 mb-2 font-normal"
             htmlFor="uploadPhoto"
@@ -156,7 +156,7 @@ export default function ReportForm() {
             />
             <button
               type="button"
-              className="mt-2 px-4 py-1 border border-blue-500 text-blue-500 rounded text-xs font-normal"
+              className="mt-2 px-4 py-1 bg-black text-white border border-black rounded text-xs font-normal hover:bg-gray-800"
               onClick={() => fileInputRef.current?.click()}
             >
               Choose File
@@ -173,7 +173,7 @@ export default function ReportForm() {
             />
           )}
 
-          {/* Location */}
+          
           <label
             className="block text-[#374151] text-sm mt-6 mb-1 font-normal"
             htmlFor="location"

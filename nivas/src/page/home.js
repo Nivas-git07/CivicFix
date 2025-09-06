@@ -11,7 +11,8 @@ import Content from "../components/ui/content";
 
 
 export default function Home() {
-    const [complaints, setComplaints] = useState([]); // <-- array, not string
+    const [complaints, setComplaints] = useState([]);
+    const [user, setUser] = useState(null);
 
     useEffect(() => {
         fetch("http://localhost:5000/api/complaints")
@@ -24,11 +25,38 @@ export default function Home() {
                 console.error("Error fetching complaints:", error);
             });
     }, []);
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        fetch("http://localhost:5000/api/user/me", {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
+            .then(async (res) => {
+                const data = await res.json(); 
+
+                if (!res.ok) {
+                    throw new Error(data.error || "Failed to fetch user");
+                }
+
+                return data; 
+            })
+            .then((data) => setUser(data))
+            .catch((err) => {
+                console.error("Error fetching user:", err.message);
+                setUser(null);
+            });
+    }, []);
+
+
+
 
     return (
 
         <div class="min-h-screen bg-gray-50">
-            <Navbar />
+            <Navbar user={{ name: user?.name, image: user?.image }} />
             <Banner />
             <main class="max-w-7xl mx-auto px-4 sm-px-6 lg-px-8 py-8">
                 <Search />
@@ -38,13 +66,13 @@ export default function Home() {
                         <Content
                             key={c.id}
                             status={c.status}
-                            counter={c.views}           
+                            counter={c.views}
                             title={c.title}
-                            discription={c.description} 
+                            discription={c.description}
                             location={c.location}
                             time={c.time}
                             upvotes={c.vote}
-                            disvotes={c.like}          
+                            disvotes={c.like}
                             comment={c.comment}
                             issueid={c.complaint_id}
                             image={c.image}

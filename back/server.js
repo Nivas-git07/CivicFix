@@ -37,20 +37,20 @@ pool.connect()
 
 app.use(express.json());
 const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
 
-    if (!token) {
-        return res.status(401).json({ error: "No token provided" });
+  if (!token) {
+    return res.status(401).json({ error: "No token provided" });
+  }
+
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(403).json({ error: "Invalid token" });
     }
-
-    jwt.verify(token, JWT_SECRET, (err, decoded) => {
-        if (err) {
-            return res.status(403).json({ error: "Invalid token" });
-        }
-        req.user = decoded;
-        next();
-    });
+    req.user = decoded;
+    next();
+  });
 };
 app.use(cors({ origin: "http://localhost:3000" }));
 app.use(express.json());
@@ -75,9 +75,7 @@ async function generateUniqueComplaintId() {
   return id;
 }
 
-// --- API Routes ---
 
-// Health check
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true });
 });
@@ -91,7 +89,8 @@ app.post("/api/report", authenticateToken, upload.single("photo"), async (req, r
       return res.status(400).json({ error: 'All fields are required (including photo)' });
     }
 
-    const userId = req.user.id; // from authenticateToken middleware
+    const userId = req.user.id;
+
 
     const complaintId = await generateUniqueComplaintId();
 
@@ -103,8 +102,10 @@ app.post("/api/report", authenticateToken, upload.single("photo"), async (req, r
     );
 
     await pool.query(
-      `INSERT INTO login (user_id, complaint_id) VALUES ($1, $2)`,
-      [userId, complaintId]
+      `UPDATE login 
+   SET complaint_id = COALESCE(complaint_id, '{}') || $1
+   WHERE user_id = $2`,
+      [[complaintId], userId]
     );
 
     res.status(201).json({ complaintId, message: 'Complaint submitted successfully' });
@@ -114,7 +115,7 @@ app.post("/api/report", authenticateToken, upload.single("photo"), async (req, r
   }
 });
 
-// Fetch complaint by ID
+
 app.get('/api/complaint/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -133,7 +134,7 @@ app.get('/api/complaint/:id', async (req, res) => {
   }
 });
 
-// --- Serve React build ---
+
 const buildPath = path.join(__dirname, '../nivas/build');
 app.use(express.static(buildPath));
 
@@ -141,5 +142,5 @@ app.get('*', (_req, res) => {
   res.sendFile(path.join(buildPath, 'index.html'));
 });
 
-// --- Start server ---
+
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));

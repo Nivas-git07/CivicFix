@@ -1,11 +1,11 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import SignInPage from "./page/SignInPage";
 import RegisterPage from "./page/RegisterPage";
-
 import ReportForm from "./page/ReportForm";
 import Home from "./page/home";
 import TrackComplaint from "./page/getcomplaint";
 import Profile from "./page/profile";
+import  PublicTransparencyMap from "./page/map";
 
 function App() {
   return (
@@ -17,6 +17,7 @@ function App() {
       <Route path="/report" element={<ReportForm />} />
       <Route path="/getcomplaint" element={<TrackComplaint />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/map" element={<PublicTransparencyMap />} />
     </Routes>
   );
 }
