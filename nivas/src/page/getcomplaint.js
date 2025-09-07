@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import Navbar from "../components/ui/nav";
 import "../components/css/home.css";
 import "../components/css/complaint.css";
-
 import ComplaintDetails from "../components/ui/complaintdetails";
-
+import ComplaintList from "../components/ui/usercomplaint";
 
 export default function TrackComplaint() {
 
@@ -70,30 +69,9 @@ export default function TrackComplaint() {
                                 Track
                             </button>
                         </div>
-                        <p className="mt-3 text-sm text-center text-gray-500">Try these demo complaint IDs</p>
-                        <div className="mt-2 flex justify-center gap-3 flex-wrap">
-                            <button
-                                type="button"
-                                onClick={() => setComplaintId("CF-123456")}
-                                className="demo-id-btn cursor-pointer rounded border border-gray-300 px-3 py-1 text-sm text-gray-700 hover:bg-blue-100 hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-1"
-                            >
-                                CF-123456
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setComplaintId("CF-789012")}
-                                className="demo-id-btn cursor-pointer rounded border border-gray-300 px-3 py-1 text-sm text-gray-700 hover:bg-blue-100 hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-1"
-                            >
-                                CF-789012
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setComplaintId("CF-345678")}
-                                className="demo-id-btn cursor-pointer rounded border border-gray-300 px-3 py-1 text-sm text-gray-700 hover:bg-blue-100 hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-1"
-                            >
-                                CF-345678
-                            </button>
-                        </div>
+                        <p className="mt-3 text-sm text-center text-gray-500">Try these your complaint IDs</p>
+                        <ComplaintList />
+                        
                     </form>
 
                     <ComplaintDetails response={response} />

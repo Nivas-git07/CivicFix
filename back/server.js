@@ -103,8 +103,8 @@ app.post("/api/report", authenticateToken, upload.single("photo"), async (req, r
 
     await pool.query(
       `UPDATE login 
-   SET complaint_id = COALESCE(complaint_id, '{}') || $1
-   WHERE user_id = $2`,
+       SET complaint_id = COALESCE(complaint_id, '{}') || $1
+       WHERE user_id = $2`,
       [[complaintId], userId]
     );
 
