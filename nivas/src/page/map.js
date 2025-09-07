@@ -43,7 +43,7 @@ function PublicTransparencyMap() {
 
                 <section className="flex gap-8">
                     <div className="flex-1 relative rounded-md border border-gray-200">
-                        <LoadScript googleMapsApiKey="AIzaSyAWZGi8-syT59Vn7avbFhnYwQBs6Z94kTM">
+                        <LoadScript googleMapsApiKey="">
                             <GoogleMap
                                 mapContainerStyle={mapContainerStyle}
                                 center={center}
