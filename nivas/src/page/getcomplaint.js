@@ -70,7 +70,7 @@ export default function TrackComplaint() {
                             </button>
                         </div>
                         <p className="mt-3 text-sm text-center text-gray-500">Try these your complaint IDs</p>
-                        <ComplaintList />
+                        <ComplaintList onSelectId={setComplaintId}/>
                         
                     </form>
 
