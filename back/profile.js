@@ -42,39 +42,7 @@ const authenticateToken = (req, res, next) => {
         next();
     });
 };
-app.get('/api/profile', authenticateToken, async (req, res) => {
-    try {
-        const userId = req.user.id;
 
-        const result = await pool.query(
-            "SELECT user_id, username, email,district,image,reputation FROM login WHERE user_id=$1",
-            [userId]
-        );
-
-        if (result.rows.length === 0) {
-            return res.status(404).json({ error: "User not found" });
-        }
-        const user = result.rows[0];
-        let imageBase64 = null;
-         if (user.image) {
-            imageBase64 = user.image.toString("base64");
-        }
-
-        res.status(200).json({
-            user_id: user.user_id,
-            username: user.username,
-            email: user.email,
-            district: user.district,
-            image: imageBase64, 
-            reputation: user.reputation,
-        });
-
-       
-    } catch (err) {
-        console.error("❌ Error fetching profile:", err.message);
-        res.status(500).json({ error: "Server error" });
-    }
-});
 const multer = require("multer");
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -97,6 +65,51 @@ app.post("/api/profile/image", authenticateToken, upload.single("image"), async 
     res.json({ message: "✅ Image updated", image: imageBuffer.toString("base64") });
   } catch (err) {
     console.error("❌ Error updating image:", err.message);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.get('/api/profile', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const userResult = await pool.query(
+      "SELECT user_id, username, email, district, image, reputation, complaint_id FROM login WHERE user_id=$1",
+      [userId]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const user = userResult.rows[0];
+    let imageBase64 = null;
+    if (user.image) {
+      imageBase64 = user.image.toString("base64");
+    }
+
+    // complaints
+    let complaints = [];
+    if (user.complaint_id) {
+      const complaintResult = await pool.query(
+        "SELECT * FROM complaint WHERE complaint_id = $1",
+        [user.complaint_id]
+      );
+      complaints = complaintResult.rows;
+    }
+
+    res.status(200).json({
+      user_id: user.user_id,
+      username: user.username,
+      email: user.email,
+      district: user.district,
+      image: imageBase64,
+      reputation: user.reputation,
+      complaints
+    });
+
+  } catch (err) {
+    console.error("❌ Error fetching profile:", err.message);
     res.status(500).json({ error: "Server error" });
   }
 });
