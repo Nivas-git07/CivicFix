@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-export default function ComplaintList() {
+export default function ComplaintList({ onSelectId }) {
     const [complaints, setComplaints] = useState([]);
     useEffect(() => {
         const fetchComplaints = async () => {
@@ -9,7 +9,7 @@ export default function ComplaintList() {
 
                 const response = await fetch("http://localhost:5000/api/complaints", {
                     headers: {
-                        Authorization: `Bearer ${token}`, 
+                        Authorization: `Bearer ${token}`,
                     },
                 });
 
@@ -34,7 +34,8 @@ export default function ComplaintList() {
                     <button
                         key={id}
                         type="button"
-                         className="inline-flex items-center bg-black text-white font-semibold rounded-md px-4 py-2 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-1"
+                        className="inline-flex items-center bg-black text-white font-semibold rounded-md px-4 py-2 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-1"
+                         onClick={() => onSelectId(id)}
                     >
                         {id}
                     </button>
