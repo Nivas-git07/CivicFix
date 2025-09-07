@@ -6,8 +6,6 @@ import ComplaintDetails from "../components/ui/complaintdetails";
 import ComplaintList from "../components/ui/usercomplaint";
 
 export default function TrackComplaint() {
-
-
     const [complaintId, setComplaintId] = useState("");
     const [response, setResponse] = useState(null);
 

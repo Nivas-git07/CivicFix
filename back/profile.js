@@ -96,6 +96,10 @@ app.get('/api/profile', authenticateToken, async (req, res) => {
         [user.complaint_id]
       );
       complaints = complaintResult.rows;
+      
+    }
+    else{
+      console.log("No complaints found for user:", userId);
     }
 
     res.status(200).json({

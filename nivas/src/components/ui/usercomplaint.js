@@ -14,7 +14,7 @@ export default function ComplaintList({ onSelectId }) {
                 });
 
                 const data = await response.json();
-                console.log("Fetched complaints:", data); // 🔍 Debug log
+                console.log("Fetched complaints:", data);
 
                 if (!response.ok) throw new Error(data.error || "Failed to fetch complaints");
 
@@ -34,7 +34,7 @@ export default function ComplaintList({ onSelectId }) {
                     <button
                         key={id}
                         type="button"
-                        className="inline-flex items-center bg-black text-white font-semibold rounded-md px-4 py-2 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-1"
+                        className="inline-flex items-center bg-black text-white font-semibold rounded-md px-4 py-1.5 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-1"
                          onClick={() => onSelectId(id)}
                     >
                         {id}
