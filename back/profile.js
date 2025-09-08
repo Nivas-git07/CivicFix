@@ -3,7 +3,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const router = express.Router();
 const app = express();
-const port = 5001;
+const port = 5000;
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET || "supersecret";
@@ -138,7 +138,4 @@ app.listen(port, () => {
 });
 
 
-app.listen(port, () => {
-    console.log(`server running on port ${port}`);
-});
 

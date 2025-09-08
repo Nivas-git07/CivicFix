@@ -9,7 +9,7 @@ export default function UserProfileCard() {
 
     useEffect(() => {
         if (!token) return;
-        fetch("http://localhost:5001/api/profile", {
+        fetch("http://localhost:5000/api/profile", {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
