@@ -100,13 +100,16 @@ app.post("/api/report", authenticateToken, upload.single("photo"), async (req, r
        VALUES ($1, $2, $3, $4, $5)`,
       [complaintId, issueType, photo, location, description]
     );
-
     await pool.query(
-      `UPDATE login 
-       SET complaint_id = COALESCE(complaint_id, '{}') || $1
-       WHERE user_id = $2`,
-      [[complaintId], userId]
-    );
+  `UPDATE login 
+   SET complaint_id = 
+       CASE 
+           WHEN complaint_id IS NULL OR complaint_id = '' THEN $1
+           ELSE complaint_id || ',' || $1
+       END
+   WHERE user_id = $2`,
+  [complaintId, userId]
+);
 
     res.status(201).json({ complaintId, message: 'Complaint submitted successfully' });
   } catch (err) {

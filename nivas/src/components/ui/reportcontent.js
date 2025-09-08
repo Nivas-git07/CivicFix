@@ -6,8 +6,8 @@ export default function ReportCard() {
   useEffect(() => {
     const fetchComplaints = async () => {
       try {
-        const token = localStorage.getItem("token"); 
-        const response = await fetch("http://localhost:5000/api/profile",{
+        const token = localStorage.getItem("token");
+        const response = await fetch("http://localhost:5001/api/profile", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -15,6 +15,7 @@ export default function ReportCard() {
         const data = await response.json();
         setComplaints(data.complaints);
         console.log(data.complaints);
+
       } catch (error) {
         console.error("Error fetching complaints:", error);
       }
@@ -42,7 +43,8 @@ export default function ReportCard() {
           >
             <div className="relative flex-shrink-0 h-48">
               <img
-                src={complaint.image}
+                key={complaint.id}
+                src={`data:image/jpeg;base64,${complaint.image}`}
                 alt={complaint.title}
                 className="w-full h-full object-cover"
               />
