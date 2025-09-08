@@ -2,6 +2,13 @@ require('dotenv').config();
 const express = require('express');
 const { Pool } = require('pg');
 const router = express.Router();
+const app = express();
+app.use(express.json());
+const cors = require('cors');
+app.use(cors());
+const port = 5000
+
+
 
 // --- Database connection ---
 const pool = new Pool({
@@ -19,7 +26,7 @@ pool.connect()
     });
 
 
-router.get("/complaint_id/:id", async (req, res) => {
+app.get("/complaint_id/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const result = await pool.query(
@@ -55,4 +62,6 @@ router.get("/complaint_id/:id", async (req, res) => {
     }
 });
 
-module.exports = router;
+app.listen(port, () => {
+    console.log(`🚀 Server running on http://localhost:${port}`);
+});

@@ -14,6 +14,7 @@ export default function ReportCard() {
         });
         const data = await response.json();
         setComplaints(data.complaints);
+        console.log(data.complaints);
       } catch (error) {
         console.error("Error fetching complaints:", error);
       }
@@ -41,7 +42,7 @@ export default function ReportCard() {
           >
             <div className="relative flex-shrink-0 h-48">
               <img
-                src={complaint.image_url}
+                src={complaint.image}
                 alt={complaint.title}
                 className="w-full h-full object-cover"
               />
