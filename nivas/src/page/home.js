@@ -31,7 +31,6 @@ export default function Home() {
 
 
     return (
-
         <div class="min-h-screen bg-gray-50">
             <Navbar  />
             <Banner />

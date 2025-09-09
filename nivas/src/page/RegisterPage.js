@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import "../components/css/RegisterPage.css"; // Import CSS
+import { Link } from "react-router-dom";
+import "../components/css/RegisterPage.css";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -11,23 +11,18 @@ export default function RegisterPage() {
     confirmPassword: "",
   });
 
-  const [loading, setLoading] = useState(false); // prevent multiple submits
-  const navigate = useNavigate(); // redirect after success
-
+  // ✅ Handle input change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // ✅ Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (loading) return; // block if already submitting
-    setLoading(true);
-
-    // simple password check
+    // simple frontend validation for passwords
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match!");
-      setLoading(false);
       return;
     }
 
@@ -36,20 +31,21 @@ export default function RegisterPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          username: formData.fullName, // change to fullName if backend expects it
+          username: formData.fullName,
           email: formData.email,
           district: formData.district,
           password: formData.password,
         }),
       });
 
+      const result = await response.json();
+
       if (!response.ok) {
-        throw new Error(`Server error: ${response.statusText}`);
+        throw new Error(result.error || "Something went wrong");
       }
 
-      const result = await response.json();
       console.log("Created successfully:", result);
-      alert("Account created successfully!");
+      alert(result.message);
 
       // reset form
       setFormData({
@@ -59,16 +55,16 @@ export default function RegisterPage() {
         password: "",
         confirmPassword: "",
       });
-
-      // redirect to login page
-      navigate("/"); // this will take user to localhost:3000/
     } catch (err) {
-      console.error("Submission failed:", err);
-      alert("Registration failed. Please try again.");
-    } finally {
-      setLoading(false);
+      console.error("Submission failed:", err.message);
+      alert(err.message);
     }
   };
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   console.log("Form Data:", formData);
+  //   // Add register logic here
+  // };
 
   return (
     <div className="register-container">
@@ -150,13 +146,14 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Submit */}
-          <button type="submit" className="register-btn" disabled={loading}>
-            {loading ? "Creating..." : "Create Account"}
+          {/* Create Account Button */}
+          <button type="submit" className="register-btn">
+            Create your acc
           </button>
         </form>
 
         {/* Terms */}
+
         <p className="terms-text">
           Already have an account? <Link to="/">Sign in</Link>
         </p>
