@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import "../components/css/RegisterPage.css"; // Import CSS
-import Navbar from "../components/ui/nav";
+import "../components/css/RegisterPage.css";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -12,38 +11,55 @@ export default function RegisterPage() {
     confirmPassword: "",
   });
 
+  // ✅ Handle input change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  // ✅ Handle form submit
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    const response = await fetch('http://localhost:5000/api/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: formData.fullName,
-        email: formData.email,
-        district:formData.district,
-        password: formData.password,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Server error: ${response.statusText}`);
+    // simple frontend validation for passwords
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match!");
+      return;
     }
 
-    const result = await response.json();
-    console.log('Created successfully:', result);
-    // Optionally, clear form or redirect
-  } catch (err) {
-    console.error('Submission failed:', err);
-    // Optionally, update UI with error message
-  }
-};
+    try {
+      const response = await fetch("http://localhost:5000/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: formData.fullName,
+          email: formData.email,
+          district: formData.district,
+          password: formData.password,
+        }),
+      });
 
+      const result = await response.json();
 
+      if (!response.ok) {
+        throw new Error(result.error || "Something went wrong");
+      }
+
+      console.log("Created successfully:", result);
+      alert(result.message);
+
+      // reset form
+      setFormData({
+        fullName: "",
+        email: "",
+        district: "",
+        password: "",
+        confirmPassword: "",
+      });
+    } catch (err) {
+      console.error("Submission failed:", err.message);
+      alert(err.message);
+    }
+  };
   // const handleSubmit = (e) => {
   //   e.preventDefault();
   //   console.log("Form Data:", formData);

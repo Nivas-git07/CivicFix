@@ -33,6 +33,16 @@ app.post("/api/register", async (req, res) => {
   try {
     const { username, email, password, district } = req.body;
     const hashedPassword = await bcrypt.hash(password,10);
+    
+   const existingUser = await pool.query(
+      "SELECT * FROM login WHERE email = $1",
+      [email]
+    );
+
+    if (existingUser.rows.length > 0) {
+      return res.status(400).json({ error: "Email already exists" });
+    }
+
 
     // Insert into database
     const result = await pool.query(
