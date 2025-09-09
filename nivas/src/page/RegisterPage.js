@@ -12,43 +12,60 @@ export default function RegisterPage() {
     confirmPassword: "",
   });
 
+  const [loading, setLoading] = useState(false); // to prevent multiple submits
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    const response = await fetch('http://localhost:5000/api/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: formData.fullName,
-        email: formData.email,
-        district:formData.district,
-        password: formData.password,
-      }),
-    });
+    if (loading) return; // stop if already submitting
+    setLoading(true);
 
-    if (!response.ok) {
-      throw new Error(`Server error: ${response.statusText}`);
+    // simple password match check
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match!");
+      setLoading(false);
+      return;
     }
 
-    const result = await response.json();
-    console.log('Created successfully:', result);
-    // Optionally, clear form or redirect
-  } catch (err) {
-    console.error('Submission failed:', err);
-    // Optionally, update UI with error message
-  }
-};
+    try {
+      const response = await fetch("http://localhost:5000/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: formData.fullName, // use 'fullName' if backend expects it
+          email: formData.email,
+          district: formData.district,
+          password: formData.password,
+        }),
+      });
 
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.statusText}`);
+      }
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   console.log("Form Data:", formData);
-  //   // Add register logic here
-  // };
+      const result = await response.json();
+      console.log("Created successfully:", result);
+      alert("Account created successfully!");
+
+      // reset form
+      setFormData({
+        fullName: "",
+        email: "",
+        district: "",
+        password: "",
+        confirmPassword: "",
+      });
+    } catch (err) {
+      console.error("Submission failed:", err);
+      alert("Registration failed. Please try again.");
+    } finally {
+      setLoading(false); // enable button again
+    }
+  };
 
   return (
     <div className="register-container">
@@ -131,13 +148,12 @@ export default function RegisterPage() {
           </div>
 
           {/* Create Account Button */}
-          <button type="submit" className="register-btn">
-            Create your acc
+          <button type="submit" className="register-btn" disabled={loading}>
+            {loading ? "Creating..." : "Create Account"}
           </button>
         </form>
 
         {/* Terms */}
-
         <p className="terms-text">
           Already have an account? <Link to="/">Sign in</Link>
         </p>
