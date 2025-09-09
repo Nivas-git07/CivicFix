@@ -5,8 +5,6 @@ import "../components/css/ReportForm.css";
 import "../components/image/image.png";
 import Navbar from "../components/ui/nav";
 
-
-
 export default function ReportForm() {
   const [issueType, setIssueType] = useState("");
   const [photoFile, setPhotoFile] = useState(null);
@@ -14,7 +12,7 @@ export default function ReportForm() {
   const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [fileName, setFileName] = useState("No file selected");
-  const [time, settime] = useState("")
+  const [time, setTime] = useState("");
 
   const fileInputRef = useRef(null);
 
@@ -30,6 +28,9 @@ export default function ReportForm() {
   };
 
   const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+
     const now = new Date();
     const options = {
       timeZone: "Asia/Kolkata",
@@ -39,42 +40,63 @@ export default function ReportForm() {
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
-      hour12: true, // AM/PM
+      hour12: true,
     };
-
     const formatted = now.toLocaleString("en-IN", options);
-    settime(formatted);
+    setTime(formatted);
 
-    e.preventDefault();
-    setSubmitting(true);
-    const uniqid = uuidv4();
-
-    const formData = new FormData();
-    formData.append("id", uniqid);
-    formData.append("issueType", issueType);
-    formData.append("photo", photoFile);
-    formData.append("location", location);
-    formData.append("description", description);
-    formData.append("time", formatted);
     try {
+      // Step 1: Validate image with n8n webhook
+      const webhookFormData = new FormData();
+      webhookFormData.append("image", photoFile);
+      webhookFormData.append("issueType", issueType);
+
+      const webhookResponse = await fetch("https://ababaa.app.n8n.cloud/webhook/image-validation", {
+        method: "POST",
+        body: webhookFormData,
+      });
+
+      if (!webhookResponse.ok) {
+        throw new Error("Image validation failed");
+      }
+
+      const webhookResult = await webhookResponse.text();
+      console.log(webhookResult);
+      if (webhookResult !== "True") {
+        alert("Image is invalid. Please upload a valid image showing the selected issue type.");
+        setSubmitting(false);
+        return;
+      }
+
+      // Step 2: If image is valid, proceed with report submission
+      const uniqid = uuidv4();
+      const formData = new FormData();
+      formData.append("id", uniqid);
+      formData.append("issueType", issueType);
+      formData.append("photo", photoFile);
+      formData.append("location", location);
+      formData.append("description", description);
+      formData.append("time", formatted);
+
       const token = localStorage.getItem("token");
       if (!token) {
         throw new Error("No token found. Please login.");
       }
+
       const response = await fetch("http://localhost:5000/api/report", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
         },
         body: formData,
-
       });
+
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText || "Submission failed");
       }
-      alert("Report submitted successfully!");
 
+      alert("Report submitted successfully!");
       setIssueType("");
       setPhotoFile(null);
       setFileName("No file selected");
@@ -86,14 +108,12 @@ export default function ReportForm() {
     } finally {
       setSubmitting(false);
     }
-  }
+  };
 
   return (
     <div>
       <Navbar />
-
       <div className="bg-transparent flex flex-col items-center px-4 py-10">
-      
         <h1 className="text-[#1B2430] font-extrabold text-2xl leading-7 text-center">
           Report Infrastructure Issue
         </h1>
@@ -101,31 +121,30 @@ export default function ReportForm() {
           Help improve our community by reporting infrastructure problems. Your
           input helps us prioritize repairs and maintenance.
         </p>
-
-        
         <form
           onSubmit={handleSubmit}
           autoComplete="off"
           className="bg-white mt-8 rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.1)] max-w-[600px] w-full p-6"
         >
-    
           <label
             className="block text-[#374151] text-sm mb-1 font-normal"
             htmlFor="issueType"
           >
             Issue Type <span className="text-[#EF4444]">*</span>
           </label>
-          <input
+          <select
             id="issueType"
-            name="issueType"
-            type="text"
-            required
+            className="w-full border border-gray-300 rounded-md px-3 py-2 text-[#374151] text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             value={issueType}
             onChange={(e) => setIssueType(e.target.value)}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-[#374151] text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-
-        
+            required
+          >
+            <option value="">Select the type of infrastructure issue</option>
+            <option value="pothole">Pothole</option>
+            <option value="streetlight">Broken Streetlight</option>
+            <option value="water_leak">Water Leak</option>
+            <option value="other">Other</option>
+          </select>
           <label
             className="block text-[#374151] text-sm mt-6 mb-2 font-normal"
             htmlFor="uploadPhoto"
@@ -172,8 +191,6 @@ export default function ReportForm() {
               className="mt-2 max-h-40 rounded-md shadow"
             />
           )}
-
-          
           <label
             className="block text-[#374151] text-sm mt-6 mb-1 font-normal"
             htmlFor="location"
@@ -199,8 +216,6 @@ export default function ReportForm() {
               <i className="fas fa-paper-plane"></i>
             </button>
           </div>
-
-          {/* Description */}
           <label
             className="block text-[#374151] text-sm mt-6 mb-1 font-normal"
             htmlFor="description"
@@ -217,8 +232,6 @@ export default function ReportForm() {
             onChange={(e) => setDescription(e.target.value)}
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-[#6B7280] text-sm placeholder:text-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
-
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={submitting}
@@ -226,7 +239,6 @@ export default function ReportForm() {
           >
             {submitting ? "Submitting..." : "Submit Report"}
           </button>
-
           <p className="text-[#6B7280] text-xs mt-4 text-center max-w-[500px] mx-auto">
             Your report will be reviewed and forwarded to authorities. You'll
             receive a complaint ID for tracking.
