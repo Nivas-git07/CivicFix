@@ -44,7 +44,6 @@ app.use(express.urlencoded({ extended: true }));
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-
 app.get("/api/user/me", async (req, res) => {
   try {
     const authHeader = req.headers["authorization"];
@@ -59,26 +58,34 @@ app.get("/api/user/me", async (req, res) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    console.log("Decoded token:", decoded); 
-
-    
     const result = await pool.query(
       "SELECT user_id, username, image FROM login WHERE user_id=$1",
-      [decoded.userId]
+      [decoded.id] 
     );
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    res.json(result.rows[0]);
+    const user = result.rows[0];
+
+    // Instead of sending buffer directly, send URL
+    let imageUrl = null;
+        if (user.image) {
+          imageUrl = user.image.toString("base64");
+        }
+    
+    res.status(200).json({
+      user_id: user.user_id,
+      username: user.username,
+      image: imageUrl,
+      
+    });
   } catch (err) {
     console.error("JWT verification or DB error:", err);
     res.status(401).json({ error: "Unauthorized" });
   }
 });
-
-
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
