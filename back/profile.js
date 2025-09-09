@@ -90,32 +90,42 @@ app.get('/api/profile', authenticateToken, async (req, res) => {
     }
 
     // complaints
-    let complaints = [];
-    if (user.complaint_id) {
-      const complaintResult = await pool.query(
-        "SELECT complaint_id, title, location, description, status, time, image FROM complaint WHERE complaint_id = $1",
-        [user.complaint_id]
-      );
+    // complaints
+let complaints = [];
+if (user.complaint_id) {
+  // Convert DB string into array of ids
+  // Remove curly braces if it's a Postgres array string like {123,456}
+  let complaintIds = user.complaint_id
+    .toString()
+    .replace(/[{}]/g, "")       // remove { }
+    .split(",")                 // split by comma
+    .map(id => id.replace(/"/g, "").trim()); // clean quotes/spaces
 
-      // Convert each complaint's image to Base64
-      complaints = complaintResult.rows.map(c => {
-        let complaintImage = null;
-        if (c.image) {
-          complaintImage = c.image.toString("base64");
-        }
-        return {
-          complaint_id: c.complaint_id,
-          title: c.title,
-          location: c.location,
-          description: c.description,
-          status: c.status,
-          time: c.time,
-          image: complaintImage
-        };
-      });
-    } else {
-      console.log("No complaints found for user:", userId);
-    }
+  if (complaintIds.length > 0) {
+    const complaintResult = await pool.query(
+      `SELECT complaint_id, title, location, description, status, time, image
+       FROM complaints
+       WHERE complaint_id = ANY($1)`,
+      [complaintIds]
+    );
+
+    complaints = complaintResult.rows.map(c => {
+      let complaintImage = null;
+      if (c.image) {
+        complaintImage = c.image.toString("base64");
+      }
+      return {
+        complaint_id: c.complaint_id,
+        title: c.title,
+        location: c.location,
+        description: c.description,
+        status: c.status,
+        time: c.time,
+        image: complaintImage
+      };
+    });
+  }
+}
 
     res.status(200).json({
       user_id: user.user_id,
