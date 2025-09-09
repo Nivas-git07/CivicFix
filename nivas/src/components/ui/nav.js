@@ -1,52 +1,77 @@
-import React from "react";
-// import { Bell } from "lucide-react"; // notification icon
-// import { User } from "lucide-react"; // user icon
-// import { MapPin } from "lucide-react"; // map pin icon
-import "../css/home.css"
+import React, { useEffect, useState } from "react";
+import "../css/home.css";
 import { Link } from "react-router-dom";
 
-function Navbar({ user }) {
-  return (
-    <header class="bg-white border-b border-gray-200">
-      <div class="max-w-7xl mx-auto px-4 sm-px-6 lg-px-8">
-        <div class="flex justify-between items-center h-16">
+function Navbar() {
+  const [user, setUser] = useState(null);
 
-          <div class="flex items-center space-x-2">
-            <div class="logo-circle">
-              <div class="logo-inner-circle"></div>
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/user/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const data = await res.json();
+        console.log("Fetched user data:", data);
+
+        if (!res.ok) throw new Error(data.error || "Failed to fetch user");
+        setUser(data);
+
+      } catch (err) {
+        console.error("Error fetching user:", err.message);
+        setUser(null);
+      }
+    };
+
+    fetchUser();
+  }, []);
+  const DEFAULT_AVATAR = "https://i.pinimg.com/474x/98/1d/6b/981d6b2e0ccb5e968a0618c8d47671da.jpg?nii=t";
+   const imageSrc =
+    user && user.image
+      ? `data:image/jpeg;base64,${user.image}`
+      : DEFAULT_AVATAR;
+
+  return (
+    <header className="bg-white border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-4 sm-px-6 lg-px-8">
+        <div className="flex justify-between items-center h-16">
+          <div className="flex items-center space-x-2">
+            <div className="logo-circle">
+              <div className="logo-inner-circle"></div>
             </div>
-            <span class="logo-text">CivicFix</span>
+            <span className="logo-text">CivicFix</span>
           </div>
 
-
-          <nav class="nav-desktop">
+          <nav className="nav-desktop">
             <Link to="/home" className="nav-link active">Home</Link>
             <Link to="/report" className="nav-link">Report</Link>
             <Link to="/getcomplaint" className="nav-link">My Complaints</Link>
             <Link to="/map" className="nav-link">Map View</Link>
             <Link to="/profile" className="nav-link">Profile</Link>
-            <Link to="/login" className="nav-link">Login</Link>
-            <Link to="/register" className="nav-link">Register</Link>
-            {!user ? (
+
+            {user ? (
               <>
-                <Link to="/login" className="nav-link">Login</Link>
-                <Link to="/register" className="nav-link">Register</Link>
+                <img
+                  src={
+                    imageSrc
+                  }
+                  alt="User Avatar"
+                  className="w-8 h-8 rounded-full border"
+                />
+                <Link to="#" className="nav-link">{user.username}</Link>
               </>
             ) : (
-              <div class="flex items-center space-x-2">
-                <img
-                  src={user.image || "https://i.pinimg.com/474x/98/1d/6b/981d6b2e0ccb5e968a0618c8d47671da.jpg?nii=t"}
-                  alt="User Avatar"
-                  class="w-8 h-8 rounded-full border"
-                />
-                <span class="text-gray-700 font-medium">{user.name}</span>
-              </div>
+              <span className="text-gray-500">Loading...</span>  
             )}
+
           </nav>
         </div>
       </div>
     </header>
-
   );
 }
 

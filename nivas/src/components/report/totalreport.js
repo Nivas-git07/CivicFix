@@ -2,7 +2,7 @@ import "../css/home.css";
 import { useState } from "react";
 
 export default function Totalreport() {
-    const [totalReports, setTotalReports] = useState(1247);
+    const [totalReports, setTotalReports] = useState(0);
     return (
         
         <div class="stat-card">
