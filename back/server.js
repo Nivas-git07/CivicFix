@@ -95,7 +95,7 @@ app.post("/api/report", authenticateToken, upload.single("photo"), async (req, r
     const complaintId = await generateUniqueComplaintId();
 
     await pool.query(
-      `INSERT INTO complaint
+      `INSERT INTO complaints
        (complaint_id, title, image, location, description)
        VALUES ($1, $2, $3, $4, $5)`,
       [complaintId, issueType, photo, location, description]
@@ -124,7 +124,7 @@ app.get('/api/complaint/:id', async (req, res) => {
     const { id } = req.params;
     const { rows } = await pool.query(
       `SELECT complaint_id, username, email, location, description, time, status
-       FROM complaint WHERE complaint_id=$1`,
+       FROM complaints WHERE complaint_id=$1`,
       [id]
     );
 
