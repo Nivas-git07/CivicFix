@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../components/css/RegisterPage.css"; // Import CSS
-import Navbar from "../components/ui/nav";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -12,43 +11,64 @@ export default function RegisterPage() {
     confirmPassword: "",
   });
 
+  const [loading, setLoading] = useState(false); // prevent multiple submits
+  const navigate = useNavigate(); // redirect after success
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    const response = await fetch('http://localhost:5000/api/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: formData.fullName,
-        email: formData.email,
-        district:formData.district,
-        password: formData.password,
-      }),
-    });
+    if (loading) return; // block if already submitting
+    setLoading(true);
 
-    if (!response.ok) {
-      throw new Error(`Server error: ${response.statusText}`);
+    // simple password check
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match!");
+      setLoading(false);
+      return;
     }
 
-    const result = await response.json();
-    console.log('Created successfully:', result);
-    // Optionally, clear form or redirect
-  } catch (err) {
-    console.error('Submission failed:', err);
-    // Optionally, update UI with error message
-  }
-};
+    try {
+      const response = await fetch("http://localhost:5000/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: formData.fullName, // change to fullName if backend expects it
+          email: formData.email,
+          district: formData.district,
+          password: formData.password,
+        }),
+      });
 
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.statusText}`);
+      }
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   console.log("Form Data:", formData);
-  //   // Add register logic here
-  // };
+      const result = await response.json();
+      console.log("Created successfully:", result);
+      alert("Account created successfully!");
+
+      // reset form
+      setFormData({
+        fullName: "",
+        email: "",
+        district: "",
+        password: "",
+        confirmPassword: "",
+      });
+
+      // redirect to login page
+      navigate("/"); // this will take user to localhost:3000/
+    } catch (err) {
+      console.error("Submission failed:", err);
+      alert("Registration failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="register-container">
@@ -130,14 +150,13 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Create Account Button */}
-          <button type="submit" className="register-btn">
-            Create your acc
+          {/* Submit */}
+          <button type="submit" className="register-btn" disabled={loading}>
+            {loading ? "Creating..." : "Create Account"}
           </button>
         </form>
 
         {/* Terms */}
-
         <p className="terms-text">
           Already have an account? <Link to="/">Sign in</Link>
         </p>
