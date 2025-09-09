@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../components/css/RegisterPage.css"; // Import CSS
-import Navbar from "../components/ui/nav";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -12,7 +11,8 @@ export default function RegisterPage() {
     confirmPassword: "",
   });
 
-  const [loading, setLoading] = useState(false); // to prevent multiple submits
+  const [loading, setLoading] = useState(false); // prevent multiple submits
+  const navigate = useNavigate(); // redirect after success
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -21,10 +21,10 @@ export default function RegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (loading) return; // stop if already submitting
+    if (loading) return; // block if already submitting
     setLoading(true);
 
-    // simple password match check
+    // simple password check
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match!");
       setLoading(false);
@@ -36,7 +36,7 @@ export default function RegisterPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          username: formData.fullName, // use 'fullName' if backend expects it
+          username: formData.fullName, // change to fullName if backend expects it
           email: formData.email,
           district: formData.district,
           password: formData.password,
@@ -59,11 +59,14 @@ export default function RegisterPage() {
         password: "",
         confirmPassword: "",
       });
+
+      // redirect to login page
+      navigate("/"); // this will take user to localhost:3000/
     } catch (err) {
       console.error("Submission failed:", err);
       alert("Registration failed. Please try again.");
     } finally {
-      setLoading(false); // enable button again
+      setLoading(false);
     }
   };
 
@@ -147,7 +150,7 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Create Account Button */}
+          {/* Submit */}
           <button type="submit" className="register-btn" disabled={loading}>
             {loading ? "Creating..." : "Create Account"}
           </button>
