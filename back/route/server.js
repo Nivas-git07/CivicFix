@@ -65,7 +65,8 @@ function random5Digit() {
 async function generateUniqueComplaintId() {
   let id, exists;
   do {
-    id = random5Digit();
+     const randomNum = random5Digit(); 
+    id = `CF-${randomNum}`;   
     const res = await pool.query('SELECT 1 FROM complaints WHERE complaint_id=$1 LIMIT 1', [id]);
     exists = res.rows.length > 0;
   } while (exists);

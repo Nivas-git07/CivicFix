@@ -19,7 +19,7 @@ export default function ComplaintList({ onSelectId }) {
                 if (!response.ok) throw new Error(data.error || "Failed to fetch complaints");
 
                 const parsed = data.complaint_ids?.match(/\d+/g) || [];
-                setComplaints(parsed);
+                setComplaints(data.complaint_ids ? parsed.map(num => `CF-${num}`) : []);
             } catch (err) {
                 console.error("Fetch error:", err);
             }
