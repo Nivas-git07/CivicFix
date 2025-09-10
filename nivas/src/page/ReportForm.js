@@ -83,7 +83,7 @@ export default function ReportForm() {
         throw new Error("No token found. Please login.");
       }
 
-      const response = await fetch("http://localhost:5000/api/report", {
+      const response = await fetch("https://civicfix.selfmade.solutions/api/report", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

@@ -10,7 +10,17 @@ const app = express();
 
 
 // Middleware
-app.use(cors());        
+const allowedOrigins = [
+  "http://localhost:3002",  // React dev server
+  "https://civicfix.selfmade.solutions"   // Production domain
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 app.use(express.json());
 
 // --- Database connection ---

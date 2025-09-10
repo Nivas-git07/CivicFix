@@ -18,7 +18,7 @@ export default function TrackComplaint() {
         }
 
         try {
-            const res = await fetch(`http://localhost:5000/api/complaints/${complaintId}`, {
+            const res = await fetch(`https://civicfix.selfmade.solutions/api/complaints/${complaintId}`, {
                 method: "GET",
                 headers: { "Content-Type": "application/json" },
             });

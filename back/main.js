@@ -33,12 +33,18 @@ pool.connect()
 
 
 
-app.use(cors({ origin: "http://localhost:3002" }));
+app.use(cors({
+  origin: ["https://civicfix.selfmade.solutions"],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-app.get("/api/complaints", async (req, res) => {
+app.get("/complaints", async (req, res) => {
     try {
         const authHeader = req.headers["authorization"];
         if (!authHeader) {
@@ -65,7 +71,7 @@ app.get("/api/complaints", async (req, res) => {
 
 // ✅ Mount routes first
 const trackRoute = require("./route/track");
-app.use("/api/complaints", trackRoute);
+app.use("/complaints", trackRoute);
 
 // other routes
 const regrouter = require("./route/reg");
@@ -76,14 +82,14 @@ const profilrouter = require("./route/profile");
 const totalreportrouter = require("./route/totalreport");
 const serverrouter = require("./route/server");
 
-app.use("/api/register", regrouter);
-app.use("/api/login", signrouter);
-app.use("/api/user/me", homerouter);
-app.use("/api/allcomplaints", complrouter);
-app.use("/api/profile", profilrouter);
-app.use("/api/total-complaints", totalreportrouter);
-app.use("/api/report", serverrouter);
-app.use("/api/profile/image", profilrouter);
+app.use("/register", regrouter);
+app.use("/login", signrouter);
+app.use("/user/me", homerouter);
+app.use("/allcomplaints", complrouter);
+app.use("/profile", profilrouter);
+app.use("/total-complaints", totalreportrouter);
+app.use("/report", serverrouter);
+app.use("/profile/image", profilrouter);
 
 // ✅ Serve React only AFTER API routes
 const buildPath = path.join(__dirname, "../nivas/build");

@@ -16,7 +16,7 @@ export default function Home() {
     
 
     useEffect(() => {
-        fetch("http://localhost:5000/api/allcomplaints")
+        fetch("https://civicfix.selfmade.solutions/api/allcomplaints")
             .then((response) => response.json())
             .then((data) => {
                 console.log("Fetched complaints:", data);

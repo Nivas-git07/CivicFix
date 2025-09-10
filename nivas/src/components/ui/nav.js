@@ -11,7 +11,7 @@ function Navbar() {
 
     const fetchUser = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/user/me", {
+        const res = await fetch("https://civicfix.selfmade.solutions/api/user/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
 

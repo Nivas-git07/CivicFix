@@ -9,7 +9,7 @@ export default function UserProfileCard() {
 
     useEffect(() => {
         if (!token) return;
-        fetch("http://localhost:5000/api/profile", {
+        fetch("https://civicfix.selfmade.solutions/api/profile", {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -92,7 +92,7 @@ export default function UserProfileCard() {
                         formData.append("image", file);
 
                         try {
-                            const res = await fetch("http://localhost:5000/api/profile/image", {
+                            const res = await fetch("https://civicfix.selfmade.solutions/api/profile/image", {
                                 method: "POST",
                                 headers: {
                                     Authorization: `Bearer ${localStorage.getItem("token")}`,
