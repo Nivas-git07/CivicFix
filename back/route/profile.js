@@ -3,7 +3,6 @@ const express = require('express');
 const { Pool } = require('pg');
 const router = express.Router();
 const app = express();
-const port = 5000;
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET || "supersecret";
@@ -47,7 +46,7 @@ const multer = require("multer");
 const upload = multer({ storage: multer.memoryStorage() });
 
 
-app.post("/api/profile/image", authenticateToken, upload.single("image"), async (req, res) => {
+router.post("/", authenticateToken, upload.single("image"), async (req, res) => {
   try {
     const userId = req.user.id;
 
@@ -68,7 +67,7 @@ app.post("/api/profile/image", authenticateToken, upload.single("image"), async 
     res.status(500).json({ error: "Server error" });
   }
 });
-app.get('/api/profile', authenticateToken, async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
 
@@ -143,9 +142,5 @@ if (user.complaint_id) {
   }
 });
 
-app.listen(port, () => {
-  console.log(`server running on port ${port}`);
-});
-
-
+module.exports = router;
 

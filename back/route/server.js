@@ -1,0 +1,145 @@
+require("dotenv").config();// adjust path as needed
+const express = require('express');
+const { Pool } = require('pg');
+const multer = require('multer');
+const cors = require('cors');
+const path = require('path');
+const app = express();
+const JWT_SECRET = process.env.JWT_SECRET || "supersecret";
+const jwt = require("jsonwebtoken");
+const router = express.Router();
+
+
+const requiredEnv = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME'];
+requiredEnv.forEach((key) => {
+  if (!process.env[key]) {
+    console.error(`Missing environment variable: ${key}`);
+    process.exit(1);
+  }
+});
+
+
+const pool = new Pool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});
+
+pool.connect()
+  .then(() => console.log('Connected to PostgreSQL'))
+  .catch((err) => {
+    console.error('Database connection error:', err.message);
+    process.exit(1);
+  });
+
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ error: "No token provided" });
+  }
+
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(403).json({ error: "Invalid token" });
+    }
+    req.user = decoded;
+    next();
+  });
+};
+app.use(cors({ origin: "http://localhost:3000" }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Multer setup for photo uploads
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+// --- Helper functions ---
+function random5Digit() {
+  return Math.floor(10000 + Math.random() * 90000).toString();
+}
+
+async function generateUniqueComplaintId() {
+  let id, exists;
+  do {
+    id = random5Digit();
+    const res = await pool.query('SELECT 1 FROM complaints WHERE complaint_id=$1 LIMIT 1', [id]);
+    exists = res.rows.length > 0;
+  } while (exists);
+  return id;
+}
+
+
+router.get('/api/health', (_req, res) => {
+  res.json({ ok: true });
+});
+
+router.post("/", authenticateToken, upload.single("photo"), async (req, res) => {
+  try {
+    const { issueType, location, description } = req.body;
+    const photo = req.file ? req.file.buffer : null;
+
+    if (!issueType || !location || !description || !photo) {
+      return res.status(400).json({ error: 'All fields are required (including photo)' });
+    }
+
+    const userId = req.user.id;
+
+
+    const complaintId = await generateUniqueComplaintId();
+
+    await pool.query(
+      `INSERT INTO complaints
+       (complaint_id, title, image, location, description)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [complaintId, issueType, photo, location, description]
+    );
+    await pool.query(
+  `UPDATE login 
+   SET complaint_id = 
+       CASE 
+           WHEN complaint_id IS NULL OR complaint_id = '' THEN $1
+           ELSE complaint_id || ',' || $1
+       END
+   WHERE user_id = $2`,
+  [complaintId, userId]
+);
+
+    res.status(201).json({ complaintId, message: 'Complaint submitted successfully' });
+  } catch (err) {
+    console.error('Error submitting complaint:', err.message);
+    res.status(500).json({ error: 'Server error: ' + err.message });
+  }
+});
+
+
+router.get('/', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rows } = await pool.query(
+      `SELECT complaint_id, username, email, location, description, time, status
+       FROM complaints WHERE complaint_id=$1`,
+      [id]
+    );
+
+    if (!rows.length) return res.status(404).json({ error: 'Complaint not found' });
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error('Error fetching complaint:', err.message);
+    res.status(500).json({ error: 'Server error: ' + err.message });
+  }
+});
+
+
+const buildPath = path.join(__dirname, '../nivas/build');
+app.use(express.static(buildPath));
+
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(buildPath, 'index.html'));
+});
+
+module.exports = router;

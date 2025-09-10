@@ -7,7 +7,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET || "supersecret";
 const app = express();
-const PORT = 5000;  
+const router = express.Router();
 
 
 // --- Check required environment variables ---
@@ -27,15 +27,13 @@ pool.connect()
   });
 app.use(cors());
 app.use(express.json());
-app.get("/api/total-complaints", async (req, res) => {
+app.get("/", async (req, res) => {
   try {
-    const result = await pool.query("SELECT COUNT(*) AS total FROM complaint");
+    const result = await pool.query("SELECT COUNT(*) AS total FROM complaints");
     res.json({ total: result.rows[0].total });
   } catch (err) {
     console.error("Error fetching total complaints:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+module.exports = router;

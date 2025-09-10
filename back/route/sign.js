@@ -7,8 +7,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET || "supersecret";
 const app = express();
-const PORT = 5000;  
-
+const router = express.Router();
 
 // --- Check required environment variables ---
 const pool = new Pool({
@@ -27,7 +26,7 @@ pool.connect()
   });
 app.use(cors());
 app.use(express.json());
-app.post("/api/login", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -62,6 +61,5 @@ app.post("/api/login", async (req, res) => {
 });
 
 // ✅ Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+
+module.exports = router;

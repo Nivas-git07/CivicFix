@@ -5,9 +5,9 @@ const multer = require('multer');
 const cors = require('cors');
 const path = require('path');
 const app = express();
-const PORT = 5000;
 const JWT_SECRET = process.env.JWT_SECRET || "supersecret";
 const jwt = require("jsonwebtoken");
+const router = express.Router();
 
 
 
@@ -44,7 +44,7 @@ app.use(express.urlencoded({ extended: true }));
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-app.get("/api/user/me", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const authHeader = req.headers["authorization"];
     if (!authHeader) {
@@ -86,6 +86,5 @@ app.get("/api/user/me", async (req, res) => {
     res.status(401).json({ error: "Unauthorized" });
   }
 });
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+
+module.exports = router;

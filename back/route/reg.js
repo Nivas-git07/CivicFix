@@ -4,9 +4,10 @@ const { Pool } = require("pg");
 const cors = require("cors");
 const path = require("path");
 require("dotenv").config();
+const router = express.Router();
 
 const app = express();
-const PORT = 5000;
+
 
 // Middleware
 app.use(cors());        
@@ -29,7 +30,7 @@ pool.connect()
   });
 
 // --- API Route for Register ---
-app.post("/api/register", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const { username, email, password, district } = req.body;
     const hashedPassword = await bcrypt.hash(password,10);
@@ -70,6 +71,5 @@ app.get("*", (_req, res) => {
 });
 
 // --- Start Server ---
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+
+module.exports = router;

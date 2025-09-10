@@ -10,6 +10,7 @@ import Content from "../components/ui/content";
 
 
 
+
 export default function Home() {
     const [complaints, setComplaints] = useState([]);
     
@@ -19,7 +20,7 @@ export default function Home() {
             .then((response) => response.json())
             .then((data) => {
                 console.log("Fetched complaints:", data);
-                setComplaints(data);
+                setComplaints(data.complaints || []);
             })
             .catch((error) => {
                 console.error("Error fetching complaints:", error);
