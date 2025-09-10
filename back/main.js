@@ -79,7 +79,7 @@ const serverrouter = require("./route/server");
 app.use("/api/register", regrouter);
 app.use("/api/login", signrouter);
 app.use("/api/user/me", homerouter);
-app.use("/api/complaints", complrouter);
+app.use("/api/allcomplaints", complrouter);
 app.use("/api/profile", profilrouter);
 app.use("/api/total-complaints", totalreportrouter);
 app.use("/api/report", serverrouter);

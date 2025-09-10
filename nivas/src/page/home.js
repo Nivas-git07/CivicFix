@@ -16,11 +16,11 @@ export default function Home() {
     
 
     useEffect(() => {
-        fetch("http://localhost:5000/api/complaints")
+        fetch("http://localhost:5000/api/allcomplaints")
             .then((response) => response.json())
             .then((data) => {
                 console.log("Fetched complaints:", data);
-                setComplaints(data.complaints || []);
+                setComplaints(data);
             })
             .catch((error) => {
                 console.error("Error fetching complaints:", error);
