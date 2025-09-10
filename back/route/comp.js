@@ -12,7 +12,7 @@ const pool = new Pool({
   database: process.env.DB_NAME,
   port: process.env.DB_PORT,
 });
-app.use(cors({ origin: "http://localhost:3000" }));
+app.use(cors({ origin: "http://localhost:3002" }));
 
 pool.connect()
   .then(() => console.log("✅ Connected to PostgreSQL"))
@@ -22,7 +22,7 @@ pool.connect()
   });
 router.get('/', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM complaints');
+    const result = await pool.query('SELECT * FROM complaint');
     const complaints = result.rows.map(row => ({
       ...row,
       image: row.image ? row.image.toString('base64') : null

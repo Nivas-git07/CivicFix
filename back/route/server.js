@@ -49,7 +49,7 @@ const authenticateToken = (req, res, next) => {
     next();
   });
 };
-app.use(cors({ origin: "http://localhost:3000" }));
+app.use(cors({ origin: "http://localhost:3002" }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -67,7 +67,7 @@ async function generateUniqueComplaintId() {
   do {
      const randomNum = random5Digit(); 
     id = `CF-${randomNum}`;   
-    const res = await pool.query('SELECT 1 FROM complaints WHERE complaint_id=$1 LIMIT 1', [id]);
+    const res = await pool.query('SELECT 1 FROM complaint WHERE complaint_id=$1 LIMIT 1', [id]);
     exists = res.rows.length > 0;
   } while (exists);
   return id;
@@ -93,7 +93,7 @@ router.post("/", authenticateToken, upload.single("photo"), async (req, res) => 
     const complaintId = await generateUniqueComplaintId();
 
     await pool.query(
-      `INSERT INTO complaints
+      `INSERT INTO complaint
        (complaint_id, title, image, location, description)
        VALUES ($1, $2, $3, $4, $5)`,
       [complaintId, issueType, photo, location, description]
@@ -122,7 +122,7 @@ router.get('/', async (req, res) => {
     const { id } = req.params;
     const { rows } = await pool.query(
       `SELECT complaint_id, username, email, location, description, time, status
-       FROM complaints WHERE complaint_id=$1`,
+       FROM complaint WHERE complaint_id=$1`,
       [id]
     );
 

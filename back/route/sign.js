@@ -26,6 +26,8 @@ pool.connect()
   });
 app.use(cors());
 app.use(express.json());
+app.use(cors({ origin: "http://localhost:3002" }));
+
 router.post("/", async (req, res) => {
   try {
     const { email, password } = req.body;

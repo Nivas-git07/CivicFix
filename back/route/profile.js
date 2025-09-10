@@ -23,7 +23,7 @@ pool.connect()
         process.exit(1);
     });
 
-app.use(cors({ origin: "http://localhost:3000" }));
+app.use(cors({ origin: "http://localhost:3002" }));
 app.use(express.json());
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers["authorization"];
@@ -103,7 +103,7 @@ if (user.complaint_id) {
   if (complaintIds.length > 0) {
     const complaintResult = await pool.query(
       `SELECT complaint_id, title, location, description, status, time, image
-       FROM complaints
+       FROM complaint
        WHERE complaint_id = ANY($1)`,
       [complaintIds]
     );

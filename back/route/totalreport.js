@@ -26,10 +26,12 @@ pool.connect()
     process.exit(1);
   });
 app.use(cors());
+app.use(cors({ origin: "http://localhost:3002" }));
+
 app.use(express.json());
 app.get("/", async (req, res) => {
   try {
-    const result = await pool.query("SELECT COUNT(*) AS total FROM complaints");
+    const result = await pool.query("SELECT COUNT(*) AS total FROM complaint");
     res.json({ total: result.rows[0].total });
   } catch (err) {
     console.error("Error fetching total complaints:", err);

@@ -1,7 +1,8 @@
 const express = require("express");
 const { Pool } = require("pg");
-
+const app = express();
 const router = express.Router();
+const cors = require('cors');
 
 const pool = new Pool({
   host: process.env.DB_HOST,
@@ -10,13 +11,16 @@ const pool = new Pool({
   database: process.env.DB_NAME,
   port: process.env.DB_PORT,
 });
+app.use(cors());
+app.use(express.json());
+app.use(cors({ origin: "http://localhost:3002" }));
 
 // GET complaint by ID
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const result = await pool.query(
-      "SELECT complaint_id, title, location, description, status, time, image FROM complaints WHERE complaint_id=$1",
+      "SELECT complaint_id, title, location, description, status, time, image FROM complaint WHERE complaint_id=$1",
       [id]
     );
 
