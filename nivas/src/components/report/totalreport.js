@@ -1,22 +1,24 @@
 import "../css/home.css";
 import { useState, useEffect } from "react";
 
-export default function Totalreport() {
-  const [totalReports, setTotalReports] = useState(0);
 
-   useEffect(() => {
+export default function Totalreport() {
+  const [totalReports, setTotalReports] = useState(6);
+
+  useEffect(() => {
     const fetchTotalReports = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/total-complaints");
+        const response = await fetch("https://civicfix.selfmade.solutions/api/total-complaints");
         const data = await response.json();
 
         if (response.ok) {
-          setTotalReports(data.total);
+          setTotalReports(Number(data.total));
+          console.log("✅ Total reports fetched:", data.total);
         } else {
-          console.error("Error fetching total complaints:", data.message);
+          console.error("❌ Error fetching total complaints:", data.message);
         }
       } catch (err) {
-        console.error("Fetch error:", err);
+        console.error("❌ Fetch error:", err);
       }
     };
 

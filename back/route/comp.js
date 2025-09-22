@@ -15,7 +15,7 @@ const pool = new Pool({
 app.use(cors({ origin: "http://localhost:3002" }));
 
 pool.connect()
-  .then(() => console.log("✅ Connected to PostgreSQL"))
+  .then(() => console.log("✅ Connected to PostgreSQLsssssssss"))
   .catch((err) => {
     console.error("❌ Database connection error:", err.message);
     process.exit(1);

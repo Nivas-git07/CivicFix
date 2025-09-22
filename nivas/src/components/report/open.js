@@ -2,7 +2,7 @@ import "../css/home.css";
 import { useState } from "react";
 
 export default function Open() {
-    const [resolvedReports, setResolvedReports] = useState(892);
+    const [resolvedReports, setResolvedReports] = useState(1);
     return (
         <div class="stat-card">
             <div class="stat-content">

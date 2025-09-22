@@ -3,7 +3,7 @@ import { useState } from "react";
 
 
 export default function Progress() {
-    const [inProgressReports, setInProgressReports] = useState(234);
+    const [inProgressReports, setInProgressReports] = useState(3);
     return (
         <div class="stat-card">
             <div class="stat-content">

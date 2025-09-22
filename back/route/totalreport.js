@@ -20,7 +20,7 @@ const pool = new Pool({
 });
 
 pool.connect()
-  .then(() => console.log("✅ Connected to PostgreSQL"))
+  .then(() => console.log("✅ Connected to PostgreSQLssss"))
   .catch((err) => {
     console.error("❌ Database connection error:", err.message);
     process.exit(1);
@@ -29,10 +29,10 @@ app.use(cors());
 app.use(cors({ origin: "http://localhost:3002" }));
 
 app.use(express.json());
-app.get("/", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const result = await pool.query("SELECT COUNT(*) AS total FROM complaint");
-    res.json({ total: result.rows[0].total });
+    res.json({ total: Number(result.rows[0].total) });
   } catch (err) {
     console.error("Error fetching total complaints:", err);
     res.status(500).json({ error: "Internal server error" });

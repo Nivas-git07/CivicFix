@@ -1,9 +1,9 @@
 import React, { useState, useRef } from "react";
-import { NavLink } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import "../components/css/ReportForm.css";
 import "../components/image/image.png";
 import Navbar from "../components/ui/nav";
+import { useNavigate } from "react-router-dom";
 
 export default function ReportForm() {
   const [issueType, setIssueType] = useState("");
@@ -14,7 +14,63 @@ export default function ReportForm() {
   const [fileName, setFileName] = useState("No file selected");
   const [time, setTime] = useState("");
 
+  // 
+  //    const navigate = useNavigate(); // ✅ put this here at top level
+
+  //   const handleSubmits = async () => {
+  //   if (!location.trim()) {
+  //     alert("Please enter a location first.");
+  //     return;
+  //   }
+
+  //   // ✅ Convert address to lat/lon once
+  //   const res = await fetch(
+  //     `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`
+  //   );
+  //   const data = await res.json();
+
+  //   if (!data || data.length === 0) {
+  //     alert("Could not find this location");
+  //     return;const fileInputRef = useRef(null);
+  //   }
+
+  //   const lat = parseFloat(data[0].lat);
+  //   const lon = parseFloat(data[0].lon);
+
+  //   // ✅ Navigate with both address + coords
+  //   navigate("/map", { state: { address: location, coords: [lat, lon] } });
+  // };
+  const [coords, setCoords] = useState(null); // ✅ store latitude & longitude
+
   const fileInputRef = useRef(null);
+  const navigate = useNavigate();
+
+  // ✅ Convert address → coords & navigate
+  const handleSubmits = async () => {
+    if (!location.trim()) {
+      alert("Please enter a location first.");
+      return;
+    }
+
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+        location
+      )}`
+    );
+    const data = await res.json();
+
+    if (!data || data.length === 0) {
+      alert("Could not find this location");
+      return;
+    }
+
+    const lat = parseFloat(data[0].lat);
+    const lon = parseFloat(data[0].lon);
+
+    setCoords({ lat, lon }); // ✅ save coords in state
+    navigate("/map", { state: { address: location, coords: [lat, lon] } });
+  };
+
 
   const onPhotoChange = (e) => {
     const file = e.target.files?.[0];
@@ -46,24 +102,50 @@ export default function ReportForm() {
     setTime(formatted);
 
     try {
+      if (!photoFile) {
+        alert("Please upload a photo.");
+        setSubmitting(false);
+        return;
+      }
+
       // Step 1: Validate image with n8n webhook
       const webhookFormData = new FormData();
       webhookFormData.append("image", photoFile);
-      webhookFormData.append("issueType", issueType);
-
-      const webhookResponse = await fetch("https://ababaa.app.n8n.cloud/webhook/image-validation", {
+      // webhookFormData.append("issueType", issueType);
+      const Response = await fetch("http://localhost:5000/extract", {
         method: "POST",
         body: webhookFormData,
       });
 
+      const webhookResponse = await fetch(
+        "https://nivas007.app.n8n.cloud/webhook/c8a1b9c1-68b9-44d1-bead-e0665e6d82f6",
+        {
+          method: "POST",
+          body: webhookFormData,
+        }
+      );
+      if (!Response.ok) {
+        const text = await Response.text(); // fallback to see HTML error
+        console.error("Error response from server:", text);
+        throw new Error("Server returned non-JSON response");
+      }
+
+
+      const data = await Response.text();
+      console.log("Response:", data);
+
       if (!webhookResponse.ok) {
-        throw new Error("Image validation failed");
+        throw new Error("Image validation request failed");
       }
 
       const webhookResult = await webhookResponse.text();
-      console.log(webhookResult);
-      if (webhookResult !== "True") {
-        alert("Image is invalid. Please upload a valid image showing the selected issue type.");
+      console.log("n8n Result:", webhookResult);
+      alert("n8n Result:", webhookResult)
+
+      if (webhookResult.trim() !== "True") {
+        // alert(
+        //   "Invalid image. Please upload the correct image for the selected issue type."
+        // );
         setSubmitting(false);
         return;
       }
@@ -83,13 +165,16 @@ export default function ReportForm() {
         throw new Error("No token found. Please login.");
       }
 
-      const response = await fetch("https://civicfix.selfmade.solutions/api/report", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
+      const response = await fetch(
+        "https://civicfix.selfmade.solutions/api/report",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -145,6 +230,7 @@ export default function ReportForm() {
             <option value="water_leak">Water Leak</option>
             <option value="other">Other</option>
           </select>
+
           <label
             className="block text-[#374151] text-sm mt-6 mb-2 font-normal"
             htmlFor="uploadPhoto"
@@ -181,6 +267,7 @@ export default function ReportForm() {
               Choose File
             </button>
           </label>
+
           {fileName && (
             <p className="text-sm text-gray-600 mt-1">{fileName}</p>
           )}
@@ -191,9 +278,11 @@ export default function ReportForm() {
               className="mt-2 max-h-40 rounded-md shadow"
             />
           )}
+
           <label
             className="block text-[#374151] text-sm mt-6 mb-1 font-normal"
             htmlFor="location"
+
           >
             Location <span className="text-[#EF4444]">*</span>
           </label>
@@ -212,10 +301,12 @@ export default function ReportForm() {
               type="button"
               aria-label="Send location"
               className="flex items-center justify-center w-10 h-10 border border-gray-300 rounded-md text-[#6B7280] hover:text-blue-600 hover:border-blue-600 transition"
+              onClick={handleSubmits}
             >
               <i className="fas fa-paper-plane"></i>
             </button>
           </div>
+
           <label
             className="block text-[#374151] text-sm mt-6 mb-1 font-normal"
             htmlFor="description"
@@ -232,6 +323,7 @@ export default function ReportForm() {
             onChange={(e) => setDescription(e.target.value)}
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-[#6B7280] text-sm placeholder:text-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
+
           <button
             type="submit"
             disabled={submitting}
@@ -239,6 +331,7 @@ export default function ReportForm() {
           >
             {submitting ? "Submitting..." : "Submit Report"}
           </button>
+
           <p className="text-[#6B7280] text-xs mt-4 text-center max-w-[500px] mx-auto">
             Your report will be reviewed and forwarded to authorities. You'll
             receive a complaint ID for tracking.
