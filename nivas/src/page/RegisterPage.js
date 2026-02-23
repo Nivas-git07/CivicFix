@@ -27,7 +27,7 @@ export default function RegisterPage() {
     }
 
     try {
-      const response = await fetch("https://civicfix.selfmade.solutions/api/register", {
+      const response = await fetch("https://civicfix-nps2.onrender.com/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

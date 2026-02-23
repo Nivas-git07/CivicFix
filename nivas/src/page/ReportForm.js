@@ -112,7 +112,7 @@ export default function ReportForm() {
       const webhookFormData = new FormData();
       webhookFormData.append("image", photoFile);
       // webhookFormData.append("issueType", issueType);
-      const Response = await fetch("http://localhost:5000/extract", {
+      const Response = await fetch("https://civicfix-nps2.onrender.com/extract", {
         method: "POST",
         body: webhookFormData,
       });
@@ -166,7 +166,7 @@ export default function ReportForm() {
       }
 
       const response = await fetch(
-        "https://civicfix.selfmade.solutions/api/report",
+        "https://civicfix-nps2.onrender.com/api/report",
         {
           method: "POST",
           headers: {

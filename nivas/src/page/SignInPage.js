@@ -13,7 +13,7 @@ function SignInPage() {
 
     try {
      
-      const response = await fetch("https://civicfix.selfmade.solutions/api/login", {
+      const response = await fetch("https://civicfix-nps2.onrender.com/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
