@@ -6,6 +6,7 @@ import Home from "./page/home";
 import TrackComplaint from "./page/getcomplaint";
 import Profile from "./page/profile";
 import PublicTransparencyMap from "./page/SimpleMap";
+import Leaderboard from "./page/Leaderboard";
 
 import "leaflet/dist/leaflet.css";
 
@@ -21,6 +22,7 @@ function App() {
         <Route path="/getcomplaint" element={<TrackComplaint />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/mapview" element={<PublicTransparencyMap />} />
+         <Route path="/leaderboard" element={<Leaderboard />}   />
       </Routes>
    
   );

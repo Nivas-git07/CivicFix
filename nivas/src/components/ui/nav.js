@@ -52,6 +52,7 @@ function Navbar() {
             <Link to="/getcomplaint" className="nav-link">My Complaints</Link>
             <Link to="/mapview" className="nav-link">Map View</Link>
             <Link to="/profile" className="nav-link">Profile</Link>
+            <Link to="/leaderboard" className="nav-link">Leaderboard</Link>
 
             {user ? (
               <>

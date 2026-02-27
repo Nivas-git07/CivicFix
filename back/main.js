@@ -8,7 +8,7 @@ const exifr = require("exifr");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET || "supersecret";
 const app = express();
-const PORT = 5000;
+const PORT = 5001;
 
 
 const requiredEnv = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME'];

@@ -1,0 +1,188 @@
+/* ============================= */
+/* Leaderboard Styles */
+/* ============================= */
+
+.leaderboard-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+
+.leaderboard-header {
+    display: grid;
+    grid-template-columns: 80px 1fr 120px 120px;
+    padding: 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    background-color: #f9fafb;
+    color: #6b7280;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.leaderboard-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 120px 120px;
+    padding: 1rem;
+    font-size: 0.875rem;
+    align-items: center;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background 0.2s ease;
+}
+
+.leaderboard-row:hover {
+    background-color: #f9fafb;
+}
+
+.rank {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.user-name {
+    font-weight: 500;
+    color: #111827;
+}
+
+.points {
+    font-weight: 600;
+    color: #3b82f6;
+}
+
+/* Top 3 Highlight */
+.leaderboard-row:nth-child(2) .user-name {
+    color: #f59e0b;
+}
+.leaderboard-row:nth-child(3) .user-name {
+    color: #9ca3af;
+}
+.leaderboard-row:nth-child(4) .user-name {
+    color: #ef4444;
+}
+/* ========================= */
+/* Leaderboard Premium Style */
+/* ========================= */
+
+.leaderboard-wrapper {
+    width: 100%;
+    max-width: 900px;
+}
+
+.leaderboard-title {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.leaderboard-title h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.leaderboard-title p {
+    color: #6b7280;
+    margin-top: 6px;
+    font-size: 0.95rem;
+}
+
+/* Card */
+.leaderboard-card {
+    background: #ffffff;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.leaderboard-card:hover {
+    box-shadow: 0 20px 35px rgba(0, 0, 0, 0.08);
+}
+
+/* Header */
+.leaderboard-header {
+    display: grid;
+    grid-template-columns: 100px 1fr 150px 150px;
+    padding: 1.25rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #6b7280;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* Rows */
+.leaderboard-row {
+    display: grid;
+    grid-template-columns: 100px 1fr 150px 150px;
+    padding: 1.25rem 1.5rem;
+    align-items: center;
+    font-size: 1rem;
+    transition: all 0.25s ease;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.leaderboard-row:last-child {
+    border-bottom: none;
+}
+
+/* Hover effect */
+.leaderboard-row:hover {
+    background-color: #f3f4f6;
+    transform: scale(1.01);
+}
+
+/* Rank styling */
+.rank {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+/* Username */
+.user-name {
+    font-weight: 600;
+    color: #111827;
+}
+
+/* Points styling */
+.points {
+    font-weight: 700;
+    color: #3b82f6;
+}
+
+/* Highlight Top 3 Rows */
+.leaderboard-row:nth-child(2) {
+    background: linear-gradient(to right, #fef3c7, #ffffff);
+}
+
+.leaderboard-row:nth-child(3) {
+    background: linear-gradient(to right, #f3f4f6, #ffffff);
+}
+
+.leaderboard-row:nth-child(4) {
+    background: linear-gradient(to right, #fee2e2, #ffffff);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .leaderboard-header,
+    .leaderboard-row {
+        grid-template-columns: 60px 1fr 80px 80px;
+        padding: 1rem;
+        font-size: 0.85rem;
+    }
+
+    .leaderboard-title h2 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .leaderboard-header,
+    .leaderboard-row {
+        grid-template-columns: 60px 1fr 80px 80px;
+        font-size: 0.75rem;
+        padding: 0.75rem;
+    }
+}
