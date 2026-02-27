@@ -16,7 +16,7 @@ function Navbar() {
         });
 
         const data = await res.json();
-        console.log("Fetched user data:", data);
+        console.log("Fetch  ed user data:", data);
 
         if (!res.ok) throw new Error(data.error || "Failed to fetch user");
         setUser(data);

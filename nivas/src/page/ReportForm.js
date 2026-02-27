@@ -41,30 +41,33 @@ export default function ReportForm() {
     setShowMap(true);
   };
 
- const onPhotoChange = async (e) => {
-  const file = e.target.files?.[0];
+  const onPhotoChange = async (e) => {
+    const file = e.target.files?.[0];
 
-  if (!file) return;
+    if (!file) return;
 
-  setPhotoFile(file);
-  setFileName(file.name);
+    setPhotoFile(file);
+    setFileName(file.name);
 
-  try {
-    const formData = new FormData();
-    formData.append("image", file);
+    try {
+      const response = await fetch("https://civicfix.app.n8n.cloud/webhook/71fa5cc2-2978-43f6-85e7-82e34fb8f009", {
+        method: "POST",
+        body: formData,
+      });
 
-    const response = await fetch("https://civicfix.app.n8n.cloud/webhook/71fa5cc2-2978-43f6-85e7-82e34fb8f009", {
-      method: "POST",
-      body: formData,
-    });
+      if (!response.ok) {
+        const text = await response.text();
+        console.error("Server error:", text);
+        return;
+      }
 
-    const result = await response.json();
-    console.log("n8n response:", result);
+      const result = await response.json();
+      console.log("n8n response:", result);
 
-  } catch (error) {
-    console.error("Upload failed:", error);
-  }
-};
+    } catch (error) {
+      console.error("Upload failed:", error);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
