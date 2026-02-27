@@ -1,145 +1,234 @@
-/* Navbar & Layout */
+/* ============================= */
+/* RESET */
+/* ============================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter",
+    "Roboto", "Oxygen", "Ubuntu", sans-serif;
+  background-color: #f9fafb;
+  color: #111827;
+  line-height: 1.5;
+}
+
+/* ============================= */
+/* NAVBAR */
+/* ============================= */
+
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #ebebeb;
-  padding: 0.75rem 1.5rem;
+  background-color: #ffffff;
+  padding: 0 2rem;
+  height: 64px;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .nav-logo {
-  font-size: 2.35rem;
-  font-weight: bold;
-  color: #000;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.5px;
 }
 
 .nav-links {
   list-style: none;
   display: flex;
-  gap: 1.2rem;
-  margin: 0;
-  padding: 0;
+  gap: 2rem;
 }
 
 .nav-links a {
   text-decoration: none;
-  color: #120d0d;
-  padding: 0.4rem;
+  color: #6b7280;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
 }
 
 .nav-links a:hover,
 .nav-links .active {
-  color: #fff;
-  border-bottom: 2px solid #fff;
+  color: #111827;
 }
+
+/* ============================= */
+/* PAGE HEADER */
+/* ============================= */
 
 .top {
   text-align: center;
-  margin: 20px 0 60px;
+  margin: 3rem 0 2rem;
 }
 
 h1 {
-  display: inline-block;
-  background-color: #d2d2d2;
-  padding: 5px 10px;
+  font-size: 1.75rem;
+  font-weight: 700;
+  background: none;
+  padding: 0;
+  color: #111827;
 }
 
-/* Form Container */
+/* ============================= */
+/* FORM CONTAINER */
+/* ============================= */
+
 .formContainer {
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-family: sans-serif;
+  max-width: 600px;
+  margin: 0 auto 3rem auto;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
 }
 
 .formContainer h2 {
-  margin-bottom: 20px;
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
 }
+
+/* ============================= */
+/* LABEL */
+/* ============================= */
 
 .formLabel {
   display: block;
-  margin-bottom: 15px;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #374151;
 }
+
+/* ============================= */
+/* INPUTS */
+/* ============================= */
 
 .formSelect,
 .formInput,
 .formTextarea {
   width: 100%;
-  padding: 8px;
-  margin-top: 5px;
-  box-sizing: border-box;
+  padding: 0.65rem 0.9rem;
+  margin-top: 0.4rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  background-color: #ffffff;
+}
+
+.formSelect:focus,
+.formInput:focus,
+.formTextarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .formTextarea {
   resize: vertical;
+  min-height: 120px;
 }
 
-/* Custom File Upload */
+/* ============================= */
+/* FILE UPLOAD */
+/* ============================= */
+
 .file-upload {
-  margin-top: 15px;
-  position: relative;
-  display: inline-block;
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #aaa;
-  border-radius: 4px;
-  background-color: #f7f7f7;
-  cursor: pointer;
+  margin-top: 10px;
+  padding: 1.5rem;
+  border: 2px dashed #d1d5db;
+  border-radius: 10px;
+  background-color: #f9fafb;
   text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
 }
 
-.file-upload:focus-within,
 .file-upload:hover {
-  outline: 2px solid #555;
-  outline-offset: 2px;
+  border-color: #3b82f6;
+  background-color: #eff6ff;
 }
 
 .file-upload__input {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   opacity: 0;
   cursor: pointer;
 }
 
 .file-upload__filename {
-  margin-top: 8px;
-  font-size: 0.9rem;
-  color: #555;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: #6b7280;
 }
 
-/* Image preview */
+/* ============================= */
+/* IMAGE PREVIEW */
+/* ============================= */
+
 .imagePreview {
-  margin-top: 10px;
+  margin-top: 1rem;
   max-width: 100%;
-  border-radius: 4px;
+  max-height: 220px;
+  border-radius: 10px;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-/* Submit button */
+/* ============================= */
+/* SUBMIT BUTTON */
+/* ============================= */
+
 .submitButton {
   width: 100%;
-  padding: 10px;
-  background: #000;
-  color: #fff;
+  padding: 0.8rem;
+  margin-top: 1.5rem;
+  background: #111827;
+  color: #ffffff;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .submitButton:hover:not(:disabled) {
-  background: rgb(92, 54, 233);
+  background: #1f2937;
 }
 
 .submitButton:disabled {
-  background: #888;
+  background: #9ca3af;
   cursor: not-allowed;
 }
 
-/* Paragraph styling */
+/* ============================= */
+/* PARAGRAPH */
+/* ============================= */
+
 p {
-  color: #888;
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-top: 1rem;
+}
+
+/* ============================= */
+/* RESPONSIVE */
+/* ============================= */
+
+@media (max-width: 640px) {
+  .formContainer {
+    padding: 1.5rem;
+  }
+
+  .nav-links {
+    gap: 1rem;
+  }
 }

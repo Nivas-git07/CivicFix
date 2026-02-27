@@ -1,9 +1,8 @@
 import React, { useState, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
-import "../components/css/ReportForm.css";
-import "../components/image/image.png";
 import Navbar from "../components/ui/nav";
 import { useNavigate } from "react-router-dom";
+import PinMapModal from "./PinMapModel";
 
 export default function ReportForm() {
   const [issueType, setIssueType] = useState("");
@@ -12,74 +11,41 @@ export default function ReportForm() {
   const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [fileName, setFileName] = useState("No file selected");
-  const [time, setTime] = useState("");
 
-  // 
-  //    const navigate = useNavigate(); // ✅ put this here at top level
-
-  //   const handleSubmits = async () => {
-  //   if (!location.trim()) {
-  //     alert("Please enter a location first.");
-  //     return;
-  //   }
-
-  //   // ✅ Convert address to lat/lon once
-  //   const res = await fetch(
-  //     `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`
-  //   );
-  //   const data = await res.json();
-
-  //   if (!data || data.length === 0) {
-  //     alert("Could not find this location");
-  //     return;const fileInputRef = useRef(null);
-  //   }
-
-  //   const lat = parseFloat(data[0].lat);
-  //   const lon = parseFloat(data[0].lon);
-
-  //   // ✅ Navigate with both address + coords
-  //   navigate("/map", { state: { address: location, coords: [lat, lon] } });
-  // };
-  const [coords, setCoords] = useState(null); // ✅ store latitude & longitude
+  const [coords, setCoords] = useState(null);
+  const [showMap, setShowMap] = useState(false);
 
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
 
-  // ✅ Convert address → coords & navigate
-  const handleSubmits = async () => {
-    if (!location.trim()) {
-      alert("Please enter a location first.");
+  // 📍 Live Location
+  const handleLiveLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation not supported");
       return;
     }
 
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-        location
-      )}`
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        setCoords({ lat, lng });
+        alert("Live location shared successfully!");
+      },
+      () => alert("Location permission denied")
     );
-    const data = await res.json();
-
-    if (!data || data.length === 0) {
-      alert("Could not find this location");
-      return;
-    }
-
-    const lat = parseFloat(data[0].lat);
-    const lon = parseFloat(data[0].lon);
-
-    setCoords({ lat, lon }); // ✅ save coords in state
-    navigate("/map", { state: { address: location, coords: [lat, lon] } });
   };
 
+  // 📌 Pin Location
+  const handlePinLocation = () => {
+    setShowMap(true);
+  };
 
   const onPhotoChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
       setPhotoFile(file);
       setFileName(file.name);
-    } else {
-      setPhotoFile(null);
-      setFileName("No file selected");
     }
   };
 
@@ -87,83 +53,27 @@ export default function ReportForm() {
     e.preventDefault();
     setSubmitting(true);
 
-    const now = new Date();
-    const options = {
-      timeZone: "Asia/Kolkata",
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true,
-    };
-    const formatted = now.toLocaleString("en-IN", options);
-    setTime(formatted);
-
     try {
       if (!photoFile) {
         alert("Please upload a photo.");
-        setSubmitting(false);
         return;
       }
 
-      // Step 1: Validate image with n8n webhook
-      const webhookFormData = new FormData();
-      webhookFormData.append("image", photoFile);
-      // webhookFormData.append("issueType", issueType);
-      const Response = await fetch("https://civicfix-nps2.onrender.com/extract", {
-        method: "POST",
-        body: webhookFormData,
-      });
-
-      const webhookResponse = await fetch(
-        "https://nivas007.app.n8n.cloud/webhook/c8a1b9c1-68b9-44d1-bead-e0665e6d82f6",
-        {
-          method: "POST",
-          body: webhookFormData,
-        }
-      );
-      if (!Response.ok) {
-        const text = await Response.text(); // fallback to see HTML error
-        console.error("Error response from server:", text);
-        throw new Error("Server returned non-JSON response");
-      }
-
-
-      const data = await Response.text();
-      console.log("Response:", data);
-
-      if (!webhookResponse.ok) {
-        throw new Error("Image validation request failed");
-      }
-
-      const webhookResult = await webhookResponse.text();
-      console.log("n8n Result:", webhookResult);
-      alert("n8n Result:", webhookResult)
-
-      if (webhookResult.trim() !== "True") {
-        // alert(
-        //   "Invalid image. Please upload the correct image for the selected issue type."
-        // );
-        setSubmitting(false);
+      if (!coords) {
+        alert("Please select a location (Live or Pin).");
         return;
       }
 
-      // Step 2: If image is valid, proceed with report submission
-      const uniqid = uuidv4();
       const formData = new FormData();
-      formData.append("id", uniqid);
+      formData.append("id", uuidv4());
       formData.append("issueType", issueType);
       formData.append("photo", photoFile);
       formData.append("location", location);
       formData.append("description", description);
-      formData.append("time", formatted);
+      formData.append("latitude", coords.lat);
+      formData.append("longitude", coords.lng);
 
       const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("No token found. Please login.");
-      }
 
       const response = await fetch(
         "https://civicfix-nps2.onrender.com/api/report",
@@ -177,19 +87,12 @@ export default function ReportForm() {
       );
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Submission failed");
+        throw new Error("Submission failed");
       }
 
       alert("Report submitted successfully!");
-      setIssueType("");
-      setPhotoFile(null);
-      setFileName("No file selected");
-      setLocation("");
-      setDescription("");
     } catch (err) {
-      console.error(err);
-      alert(`Error: ${err.message}`);
+      alert(err.message);
     } finally {
       setSubmitting(false);
     }
@@ -198,146 +101,109 @@ export default function ReportForm() {
   return (
     <div>
       <Navbar />
-      <div className="bg-transparent flex flex-col items-center px-4 py-10">
-        <h1 className="text-[#1B2430] font-extrabold text-2xl leading-7 text-center">
+
+      <div className="flex flex-col items-center px-4 py-10">
+        <h1 className="text-2xl font-bold mb-6">
           Report Infrastructure Issue
         </h1>
-        <p className="text-[#4B5563] text-center text-sm max-w-[400px] mt-2 leading-5">
-          Help improve our community by reporting infrastructure problems. Your
-          input helps us prioritize repairs and maintenance.
-        </p>
+
         <form
           onSubmit={handleSubmit}
-          autoComplete="off"
-          className="bg-white mt-8 rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.1)] max-w-[600px] w-full p-6"
+          className="bg-white shadow-lg rounded-lg p-6 w-full max-w-[600px]"
         >
-          <label
-            className="block text-[#374151] text-sm mb-1 font-normal"
-            htmlFor="issueType"
-          >
-            Issue Type <span className="text-[#EF4444]">*</span>
-          </label>
+          {/* Issue Type */}
           <select
-            id="issueType"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-[#374151] text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             value={issueType}
             onChange={(e) => setIssueType(e.target.value)}
             required
+            className="w-full border p-2 rounded mb-4"
           >
-            <option value="">Select the type of infrastructure issue</option>
+            <option value="">Select Issue Type</option>
             <option value="pothole">Pothole</option>
             <option value="streetlight">Broken Streetlight</option>
             <option value="water_leak">Water Leak</option>
-            <option value="other">Other</option>
           </select>
 
-          <label
-            className="block text-[#374151] text-sm mt-6 mb-2 font-normal"
-            htmlFor="uploadPhoto"
-          >
-            Upload a Photo
-          </label>
-          <label
-            htmlFor="uploadPhoto"
-            className="cursor-pointer flex flex-col items-center justify-center border border-gray-300 rounded-md bg-[#F3F4F6] h-32 text-[#6B7280] text-sm select-none"
-          >
-            <img
-              src="https://storage.googleapis.com/a1aa/image/e0a27f9d-05d3-4294-5fa4-aaf2a66a71c5.jpg"
-              alt="Icon of a photo placeholder"
-              width="24"
-              height="24"
-              className="mb-2"
-            />
-            Drag and drop a photo or click to browse
-            <input
-              id="uploadPhoto"
-              name="uploadPhoto"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              ref={fileInputRef}
-              onChange={onPhotoChange}
-              required
-            />
-            <button
-              type="button"
-              className="mt-2 px-4 py-1 bg-black text-white border border-black rounded text-xs font-normal hover:bg-gray-800"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              Choose File
-            </button>
-          </label>
+          {/* Photo Upload */}
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            onChange={onPhotoChange}
+            required
+            className="mb-3"
+          />
 
-          {fileName && (
-            <p className="text-sm text-gray-600 mt-1">{fileName}</p>
-          )}
           {photoFile && (
             <img
               src={URL.createObjectURL(photoFile)}
               alt="Preview"
-              className="mt-2 max-h-40 rounded-md shadow"
+              className="mb-4 max-h-40 rounded"
             />
           )}
 
-          <label
-            className="block text-[#374151] text-sm mt-6 mb-1 font-normal"
-            htmlFor="location"
-
-          >
-            Location <span className="text-[#EF4444]">*</span>
-          </label>
-          <div className="flex items-center space-x-2">
-            <input
-              id="location"
-              name="location"
-              type="text"
-              placeholder="Enter the location of the issue"
-              required
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="flex-grow border border-gray-300 rounded-md px-3 py-2 text-[#6B7280] text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+          {/* Location Options */}
+          <div className="flex gap-3 mb-3">
             <button
               type="button"
-              aria-label="Send location"
-              className="flex items-center justify-center w-10 h-10 border border-gray-300 rounded-md text-[#6B7280] hover:text-blue-600 hover:border-blue-600 transition"
-              onClick={handleSubmits}
+              onClick={handleLiveLocation}
+              className="flex-1 bg-green-600 text-white py-2 rounded"
             >
-              <i className="fas fa-paper-plane"></i>
+              📍 Share Live Location
+            </button>
+
+            <button
+              type="button"
+              onClick={handlePinLocation}
+              className="flex-1 bg-blue-600 text-white py-2 rounded"
+            >
+              📌 Pin Location
             </button>
           </div>
 
-          <label
-            className="block text-[#374151] text-sm mt-6 mb-1 font-normal"
-            htmlFor="description"
-          >
-            Description <span className="text-[#EF4444]">*</span>
-          </label>
+          {/* Manual Address */}
+          <input
+            type="text"
+            placeholder="Or type address manually"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            className="w-full border p-2 rounded mb-3"
+          />
+
+          {/* Show Selected Coords */}
+          {coords && (
+            <div className="text-sm text-gray-600 mb-3">
+              Lat: {coords.lat} | Lng: {coords.lng}
+            </div>
+          )}
+
+          {/* Description */}
           <textarea
-            id="description"
-            name="description"
             rows="4"
-            placeholder="Describe the issue in detail. Include any safety concerns or urgency."
-            required
+            placeholder="Describe the issue"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-[#6B7280] text-sm placeholder:text-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            required
+            className="w-full border p-2 rounded mb-4"
           />
 
           <button
             type="submit"
             disabled={submitting}
-            className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-normal py-3 rounded-md transition"
+            className="w-full bg-black text-white py-2 rounded"
           >
             {submitting ? "Submitting..." : "Submit Report"}
           </button>
-
-          <p className="text-[#6B7280] text-xs mt-4 text-center max-w-[500px] mx-auto">
-            Your report will be reviewed and forwarded to authorities. You'll
-            receive a complaint ID for tracking.
-          </p>
         </form>
       </div>
+
+      {/* Map Modal */}
+      {showMap && (
+        <PinMapModal
+          setCoords={setCoords}
+          onClose={() => setShowMap(false)}
+        />
+      )}
     </div>
   );
 }
