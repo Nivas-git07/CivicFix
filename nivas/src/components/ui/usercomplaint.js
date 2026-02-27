@@ -7,7 +7,7 @@ export default function ComplaintList({ onSelectId }) {
             try {
                 const token = localStorage.getItem("token");
 
-                const response = await fetch("https://civicfix-nps2.onrender.com/complaints", {
+                const response = await fetch("https://backend.todayworld.in/complaints", {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },

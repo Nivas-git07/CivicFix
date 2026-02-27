@@ -9,7 +9,7 @@ export default function UserProfileCard() {
 
     useEffect(() => {
         if (!token) return;
-        fetch("https://civicfix-nps2.onrender.com/profile", {
+        fetch("https://backend.todayworld.in/profile", {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,

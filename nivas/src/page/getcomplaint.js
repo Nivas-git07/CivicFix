@@ -18,7 +18,7 @@ export default function TrackComplaint() {
         }
 
         try {
-            const res = await fetch(`https://civicfix-nps2.onrender.com/complaints/${complaintId}`, {
+            const res = await fetch(`https://backend.todayworld.in/complaints/${complaintId}`, {
                 method: "GET",
                 headers: { "Content-Type": "application/json" },
             });
