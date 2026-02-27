@@ -53,6 +53,7 @@ function Navbar() {
             <Link to="/mapview" className="nav-link">Map View</Link>
             <Link to="/profile" className="nav-link">Profile</Link>
             <Link to="/leaderboard" className="nav-link">Leaderboard</Link>
+             <Link to="/recycle" className="nav-link">Recycle & Earn</Link>
 
             {user ? (
               <>

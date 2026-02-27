@@ -7,6 +7,7 @@ import TrackComplaint from "./page/getcomplaint";
 import Profile from "./page/profile";
 import PublicTransparencyMap from "./page/SimpleMap";
 import Leaderboard from "./page/Leaderboard";
+import RecycleSmartMap from "./page/Recycle";
 
 import "leaflet/dist/leaflet.css";
 
@@ -23,6 +24,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/mapview" element={<PublicTransparencyMap />} />
          <Route path="/leaderboard" element={<Leaderboard />}   />
+         <Route path="/recycle" element={<RecycleSmartMap />} />
       </Routes>
    
   );
