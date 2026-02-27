@@ -11,12 +11,12 @@ const app = express();
 
 // Middleware
 const allowedOrigins = [
-  "http://localhost:3002",  // React dev server
+  "",  // React dev server
   "https://civicfix.selfmade.solutions"   // Production domain
 ];
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: "*",
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"]

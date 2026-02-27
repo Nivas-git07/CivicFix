@@ -13,10 +13,16 @@ import Content from "../components/ui/content";
 
 export default function Home() {
     const [complaints, setComplaints] = useState([]);
-    
+
 
     useEffect(() => {
-        fetch("https://backend.todayworld.in/complaints")
+        const token = localStorage.getItem("token");
+
+        fetch("https://backend.todayworld.in/complaints", {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
             .then((response) => response.json())
             .then((data) => {
                 console.log("Fetched complaints:", data);
@@ -26,14 +32,14 @@ export default function Home() {
                 console.error("Error fetching complaints:", error);
             });
     }, []);
-    
+
 
 
 
 
     return (
         <div class="min-h-screen bg-gray-50">
-            <Navbar  />
+            <Navbar />
             <Banner />
             <main class="max-w-7xl mx-auto px-4 sm-px-6 lg-px-8 py-8">
                 <Search />

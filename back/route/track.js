@@ -13,7 +13,7 @@ const pool = new Pool({
 });
 app.use(cors());
 app.use(express.json());
-app.use(cors({ origin: "http://localhost:3002" }));
+app.use(cors({ origin: "*" }));
 
 // GET complaint by ID
 router.get("/:id", async (req, res) => {

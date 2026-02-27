@@ -49,7 +49,7 @@ const authenticateToken = (req, res, next) => {
     next();
   });
 };
-app.use(cors({ origin: "http://localhost:3002" }));
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

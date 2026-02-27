@@ -12,7 +12,7 @@ const pool = new Pool({
   database: process.env.DB_NAME,
   port: process.env.DB_PORT,
 });
-app.use(cors({ origin: "http://localhost:3002" }));
+app.use(cors({ origin: "*" }));
 
 pool.connect()
   .then(() => console.log("✅ Connected to PostgreSQLsssssssss"))
