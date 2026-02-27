@@ -43,17 +43,22 @@ export default function ReportForm() {
 
   const onPhotoChange = async (e) => {
     const file = e.target.files?.[0];
-
     if (!file) return;
 
     setPhotoFile(file);
     setFileName(file.name);
 
     try {
-      const response = await fetch("https://civicfix.app.n8n.cloud/webhook/71fa5cc2-2978-43f6-85e7-82e34fb8f009", {
-        method: "POST",
-        body: new FormData().append("image", file)
-      });
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const response = await fetch(
+        "https://civicfix.app.n8n.cloud/webhook/71fa5cc2-2978-43f6-85e7-82e34fb8f009",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       if (!response.ok) {
         const text = await response.text();
@@ -92,7 +97,7 @@ export default function ReportForm() {
       formData.append("description", description);
       formData.append("latitude", coords.lat);
       formData.append("longitude", coords.lng);
-      
+
 
       const token = localStorage.getItem("token");
 
