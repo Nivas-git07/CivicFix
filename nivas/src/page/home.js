@@ -16,7 +16,7 @@ export default function Home() {
     
 
     useEffect(() => {
-        fetch("http://backend.todayworld.in/complaints")
+        fetch("https://backend.todayworld.in/complaints")
             .then((response) => response.json())
             .then((data) => {
                 console.log("Fetched complaints:", data);

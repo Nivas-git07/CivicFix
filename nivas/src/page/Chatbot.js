@@ -57,7 +57,7 @@ export default function Chatbot({ issueType, image }) {
 
     try {
       const res = await axios.post(
-        "http://backend.todayworld.in/api/chat",
+        "https://backend.todayworld.in/api/chat",
         {
           message: userMessage.text,
           language,
