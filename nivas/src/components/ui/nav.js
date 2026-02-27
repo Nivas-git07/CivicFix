@@ -11,7 +11,7 @@ function Navbar() {
 
     const fetchUser = async () => {
       try {
-        const res = await fetch("https://civicfix-nps2.onrender.com/user/me", {
+        const res = await fetch("https://backend.todayworld.in/user/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
 

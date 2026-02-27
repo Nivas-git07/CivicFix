@@ -8,7 +8,7 @@ export default function ReportCard() {
     const fetchComplaints = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("https://civicfix-nps2.onrender.com/profile", {
+        const response = await fetch("https://backend.todayworld.in/profile", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
