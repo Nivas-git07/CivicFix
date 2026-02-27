@@ -132,6 +132,9 @@ export default function ReportForm() {
       formData.append("latitude", coords.lat);
       formData.append("longitude", coords.lng);
 
+      const formdataForN8n = new FormData();
+      formdataForN8n.append("image", photoFile);
+
       const token = localStorage.getItem("token");
 
       const response = await fetch(
@@ -141,7 +144,7 @@ export default function ReportForm() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          body: formData,
+          body: formdataForN8n,
         }
       );
 
