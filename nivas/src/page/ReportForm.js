@@ -41,13 +41,30 @@ export default function ReportForm() {
     setShowMap(true);
   };
 
-  const onPhotoChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setPhotoFile(file);
-      setFileName(file.name);
-    }
-  };
+ const onPhotoChange = async (e) => {
+  const file = e.target.files?.[0];
+
+  if (!file) return;
+
+  setPhotoFile(file);
+  setFileName(file.name);
+
+  try {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const response = await fetch("https://civicfix.app.n8n.cloud/webhook/71fa5cc2-2978-43f6-85e7-82e34fb8f009", {
+      method: "POST",
+      body: formData,
+    });
+
+    const result = await response.json();
+    console.log("n8n response:", result);
+
+  } catch (error) {
+    console.error("Upload failed:", error);
+  }
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -76,7 +93,7 @@ export default function ReportForm() {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        "https://civicfix-nps2.onrender.com/api/report",
+        "https://backend.todayworld.in/api/report",
         {
           method: "POST",
           headers: {
