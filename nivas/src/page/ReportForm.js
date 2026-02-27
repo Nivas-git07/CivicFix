@@ -14,55 +14,11 @@ export default function ReportForm() {
 
   const [coords, setCoords] = useState(null);
   const [showMap, setShowMap] = useState(false);
-  const [placeType, setPlaceType] = useState(null);
 
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
 
-  /* ===============================
-     🔍 Reverse Geocoding + Validation
-  =============================== */
-
-  const checkLocationType = async (lat, lng) => {
-    try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
-      );
-
-      const data = await res.json();
-
-      const locationClass = data.class;
-      const locationType = data.type;
-
-      console.log("Class:", locationClass);
-      console.log("Type:", locationType);
-
-      setPlaceType(locationType);
-
-      // 🚨 BLOCK PRIVATE RESIDENTIAL
-      if (
-        locationType === "residential" ||
-        locationType === "apartments" ||
-        locationType === "house"
-      ) {
-        console.log("Blocked location type:", locationType);
-        alert(
-          "⚠️ This appears to be a private residential building.\nPlease use municipal bins for household waste."
-        );
-        return false;
-      }
-
-      return true;
-    } catch (error) {
-      console.error("Reverse geocode failed:", error);
-      return true; // allow if API fails
-    }
-  };
-
-  /* ===============================
-     📍 Live Location
-  =============================== */
-
+  // 📍 Live Location
   const handleLiveLocation = () => {
     if (!navigator.geolocation) {
       alert("Geolocation not supported");
@@ -70,13 +26,9 @@ export default function ReportForm() {
     }
 
     navigator.geolocation.getCurrentPosition(
-      async (position) => {
+      (position) => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
-
-        const allowed = await checkLocationType(lat, lng);
-        if (!allowed) return;
-
         setCoords({ lat, lng });
         alert("Live location shared successfully!");
       },
@@ -84,29 +36,38 @@ export default function ReportForm() {
     );
   };
 
-  /* ===============================
-     📌 Pin Location
-  =============================== */
-
+  // 📌 Pin Location
   const handlePinLocation = () => {
     setShowMap(true);
   };
 
-  /* ===============================
-     📷 Photo Upload
-  =============================== */
-
   const onPhotoChange = async (e) => {
     const file = e.target.files?.[0];
+
     if (!file) return;
 
     setPhotoFile(file);
     setFileName(file.name);
-  };
 
-  /* ===============================
-     🚀 Submit Report
-  =============================== */
+    try {
+      const response = await fetch("https://civicfix.app.n8n.cloud/webhook/71fa5cc2-2978-43f6-85e7-82e34fb8f009", {
+        method: "POST",
+        body: new FormData().append("image", file)
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        console.error("Server error:", text);
+        return;
+      }
+
+      const result = await response.json();
+      console.log("n8n response:", result);
+
+    } catch (error) {
+      console.error("Upload failed:", error);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -131,9 +92,7 @@ export default function ReportForm() {
       formData.append("description", description);
       formData.append("latitude", coords.lat);
       formData.append("longitude", coords.lng);
-
-      const formdataForN8n = new FormData();
-      formdataForN8n.append("image", photoFile);
+      
 
       const token = localStorage.getItem("token");
 
@@ -144,7 +103,7 @@ export default function ReportForm() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          body: formdataForN8n,
+          body: formData,
         }
       );
 
@@ -159,10 +118,6 @@ export default function ReportForm() {
       setSubmitting(false);
     }
   };
-
-  /* ===============================
-     UI
-  =============================== */
 
   return (
     <div>
@@ -240,8 +195,6 @@ export default function ReportForm() {
           {coords && (
             <div className="text-sm text-gray-600 mb-3">
               Lat: {coords.lat} | Lng: {coords.lng}
-              <br />
-              Place Type: {placeType}
             </div>
           )}
 
@@ -265,20 +218,10 @@ export default function ReportForm() {
         </form>
       </div>
 
-      {/* Pin Map Modal */}
+      {/* Map Modal */}
       {showMap && (
         <PinMapModal
-          setCoords={async (latlng) => {
-            const allowed = await checkLocationType(
-              latlng.lat,
-              latlng.lng
-            );
-
-            if (!allowed) return;
-
-            setCoords(latlng);
-            setShowMap(false);
-          }}
+          setCoords={setCoords}
           onClose={() => setShowMap(false)}
         />
       )}
