@@ -1,4 +1,5 @@
 import React from "react";
+import Navbar from "../components/ui/nav";
 import "../components/css/leader.css";
 
 export default function Leaderboard() {
@@ -11,6 +12,9 @@ export default function Leaderboard() {
   ];
 
   return (
+    <>
+      <Navbar />
+   
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-10">
       <div className="leaderboard-wrapper">
 
@@ -44,5 +48,6 @@ export default function Leaderboard() {
         </div>
       </div>
     </div>
+    </>
   );
 }
