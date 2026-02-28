@@ -18,7 +18,7 @@ export default function Home() {
     useEffect(() => {
         const token = localStorage.getItem("token");
 
-        fetch("https://backend.todayworld.in/complaints", {
+        fetch("https://quiz.selfmade.express/complaints", {
             headers: {
                 Authorization: `Bearer ${token}`
             }

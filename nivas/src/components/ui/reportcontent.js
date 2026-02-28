@@ -8,7 +8,7 @@ export default function ReportCard() {
     const fetchComplaints = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("https://backend.todayworld.in/profile", {
+        const response = await fetch("https://quiz.selfmade.express/profile", {
           headers: {
             Authorization: `Bearer ${token}`,
           },

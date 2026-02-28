@@ -9,7 +9,7 @@ export default function UserProfileCard() {
 
     useEffect(() => {
         if (!token) return;
-        fetch("https://backend.todayworld.in/profile", {
+        fetch("https://quiz.selfmade.express/profile", {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
