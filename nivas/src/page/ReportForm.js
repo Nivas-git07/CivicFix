@@ -41,38 +41,79 @@ export default function ReportForm() {
     setShowMap(true);
   };
 
-  const onPhotoChange = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+const onPhotoChange = async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
 
-    setPhotoFile(file);
-    setFileName(file.name);
+  setPhotoFile(file);
+  setFileName(file.name);
 
-    try {
-      const formData = new FormData();
-      formData.append("image", file);
+  try {
+    const formData = new FormData();
+    formData.append("image", file);
 
-      const response = await fetch(
-        "https://civicfix.app.n8n.cloud/webhook/71fa5cc2-2978-43f6-85e7-82e34fb8f009",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      if (!response.ok) {
-        const text = await response.text();
-        console.error("Server error:", text);
-        return;
+    const response = await fetch(
+      "https://civicfix.app.n8n.cloud/webhook/71fa5cc2-2978-43f6-85e7-82e34fb8f009",
+      {
+        method: "POST",
+        body: formData,
       }
+    );
 
-      const result = await response.json();
-      console.log("n8n response:", result);
-
-    } catch (error) {
-      console.error("Upload failed:", error);
+    if (!response.ok) {
+      const text = await response.text();
+      console.error("Server error:", text);
+      return;
     }
-  };
+
+    const result = await response.json();
+    console.log("n8n raw response:", result);
+    
+
+    // ✅ Extract AI text
+    const aiText = result?.[0]?.content?.parts?.[0]?.text;
+
+    if (!aiText) return;
+
+    // ✅ Remove ```json wrapper
+    const cleaned = aiText
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
+
+    const parsed = JSON.parse(cleaned);
+
+    console.log("Parsed AI result:", parsed);
+    alert(`AI detected category: ${parsed.category || "None"}`);
+    
+
+   
+   // ✅ If AI says image is invalid
+if (parsed.category === "invalid") {
+  alert("⚠️ Please upload a correct image related to civic issue.");
+  setIssueType("");
+  return; // stop further execution
+}
+
+// ✅ If AI detected valid category
+if (parsed.category) {
+  setIssueType(parsed.category);
+}
+
+    // ✅ If AI provided coordinates
+    if (parsed.latitude && parsed.longitude) {
+      setCoords({
+        lat: parsed.latitude,
+        lng: parsed.longitude,
+      });
+
+      alert("📍 Location detected from image!");
+    }
+
+  } catch (error) {
+    console.error("Upload failed:", error);
+  }
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -95,8 +136,8 @@ export default function ReportForm() {
       formData.append("photo", photoFile);
       formData.append("location", location);
       formData.append("description", description);
-      formData.append("latitude", coords.lat);
-      formData.append("longitude", coords.lng);
+     formData.append("latitude", coords?.lat || "");
+formData.append("longitude", coords?.lng || "");
 
 
       const token = localStorage.getItem("token");
@@ -138,54 +179,61 @@ export default function ReportForm() {
           className="bg-white shadow-lg rounded-lg p-6 w-full max-w-[600px]"
         >
           {/* Issue Type */}
-          <select
-            value={issueType}
-            onChange={(e) => setIssueType(e.target.value)}
-            required
-            className="w-full border p-2 rounded mb-4"
-          >
-            <option value="">Select Issue Type</option>
-            <option value="pothole">Pothole</option>
-            <option value="streetlight">Broken Streetlight</option>
-            <option value="water_leak">Water Leak</option>
-          </select>
+         
 
           {/* Photo Upload */}
-          <input
-            type="file"
-            accept="image/*"
-            ref={fileInputRef}
-            onChange={onPhotoChange}
-            required
-            className="mb-3"
-          />
+ <div className="uploadWrapper">
+  <label className="uploadCard">
+    <div className="uploadIconWrapper">
+      <div className="cameraIcon">📷</div>
+      <div className="uploadArrow">⬆</div>
+    </div>
 
-          {photoFile && (
-            <img
-              src={URL.createObjectURL(photoFile)}
-              alt="Preview"
-              className="mb-4 max-h-40 rounded"
-            />
-          )}
+    <p className="uploadLabel">
+      {fileName === "No file selected"
+        ? "Upload Issue Image"
+        : fileName}
+    </p>
+
+    <input
+      type="file"
+      accept="image/*"
+      ref={fileInputRef}
+      onChange={onPhotoChange}
+      required
+      hidden
+    />
+  </label>
+</div>
+
+   {photoFile && (
+  <div className="flex justify-center mb-6">
+    <img
+      src={URL.createObjectURL(photoFile)}
+      alt="Preview"
+      className="w-full max-w-[450px] h-[280px] object-cover rounded-xl shadow-md border border-gray-200"
+    />
+  </div>
+)}
 
           {/* Location Options */}
-          <div className="flex gap-3 mb-3">
-            <button
-              type="button"
-              onClick={handleLiveLocation}
-              className="flex-1 bg-green-600 text-white py-2 rounded"
-            >
-              📍 Share Live Location
-            </button>
+<div className="locationButtons">
+  <button
+    type="button"
+    onClick={handleLiveLocation}
+    className="locationBtn blackBtn"
+  >
+    📍 Share Live Location
+  </button>
 
-            <button
-              type="button"
-              onClick={handlePinLocation}
-              className="flex-1 bg-blue-600 text-white py-2 rounded"
-            >
-              📌 Pin Location
-            </button>
-          </div>
+  <button
+    type="button"
+    onClick={handlePinLocation}
+    className="locationBtn grayBtn"
+  >
+    📌 Pin Location
+  </button>
+</div>
 
           {/* Manual Address */}
           <input
@@ -203,15 +251,7 @@ export default function ReportForm() {
             </div>
           )}
 
-          {/* Description */}
-          <textarea
-            rows="4"
-            placeholder="Describe the issue"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-            className="w-full border p-2 rounded mb-4"
-          />
+         
 
           <button
             type="submit"
