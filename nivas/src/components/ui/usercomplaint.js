@@ -7,7 +7,7 @@ export default function ComplaintList({ onSelectId }) {
             try {
                 const token = localStorage.getItem("token");
 
-                const response = await fetch("https://backend.todayworld.in/complaints", {
+                const response = await fetch("https://quiz.selfmade.express/complaints", {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },

@@ -102,7 +102,7 @@ export default function ReportForm() {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        "https://backend.todayworld.in/api/report",
+        "https://quiz.selfmade.express/api/report",
         {
           method: "POST",
           headers: {
