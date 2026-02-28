@@ -47,7 +47,7 @@ function Navbar() {
           </div>
 
           <nav className="nav-desktop">
-            <Link to="/home" className="nav-link active">Home</Link>
+            <Link to="/" className="nav-link active">Home</Link>
             <Link to="/report" className="nav-link">Report</Link>
             <Link to="/getcomplaint" className="nav-link">My Complaints</Link>
             <Link to="/mapview" className="nav-link">Map View</Link>

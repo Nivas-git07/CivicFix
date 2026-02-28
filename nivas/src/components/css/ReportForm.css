@@ -170,26 +170,48 @@ h1 {
   resize: vertical;
   min-height: 120px;
 }
-
 /* ============================= */
-/* FILE UPLOAD */
+/* ENHANCED FILE UPLOAD */
 /* ============================= */
 
 .file-upload {
   margin-top: 10px;
-  padding: 1.5rem;
-  border: 2px dashed #d1d5db;
-  border-radius: 10px;
-  background-color: #f9fafb;
+  padding: 2.5rem 1.5rem;
+  border: 2px dashed #e5e7eb;
+  border-radius: 12px;
+  background-color: #fcfcfd;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
 }
 
+/* Hover state for the upload box */
 .file-upload:hover {
   border-color: #3b82f6;
-  background-color: #eff6ff;
+  background-color: #f8faff;
+  transform: translateY(-2px);
+}
+
+/* The Icon (Using your uploaded image as a mask or background) */
+.file-upload::before {
+  content: "";
+  width: 48px;
+  height: 48px;
+  background-image: url('image_8dcb5b.png'); /* Your uploaded icon */
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.file-upload:hover::before {
+  opacity: 1;
 }
 
 .file-upload__input {
@@ -197,54 +219,79 @@ h1 {
   inset: 0;
   opacity: 0;
   cursor: pointer;
+  z-index: 2;
 }
 
-.file-upload__filename {
-  margin-top: 0.75rem;
-  font-size: 0.85rem;
-  color: #6b7280;
+.file-upload__text {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.file-upload__subtext {
+  font-size: 0.8rem;
+  color: #9ca3af;
 }
 
 /* ============================= */
-/* IMAGE PREVIEW */
+/* IMAGE PREVIEW (The "Uploaded" Look) */
 /* ============================= */
 
 .imagePreview {
-  margin-top: 1rem;
-  max-width: 100%;
-  max-height: 220px;
-  border-radius: 10px;
+  margin-top: 1.5rem;
+  width: 100%;
+  max-height: 280px;
+  border-radius: 12px;
   object-fit: cover;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 4px solid #ffffff;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  display: block; /* Ensures it looks like a card */
+  transition: transform 0.2s ease;
+}
+
+.imagePreview:hover {
+  transform: scale(1.02);
 }
 
 /* ============================= */
-/* SUBMIT BUTTON */
+/* PREMIUM SUBMIT BUTTON */
 /* ============================= */
 
 .submitButton {
   width: 100%;
-  padding: 0.8rem;
-  margin-top: 1.5rem;
-  background: #111827;
+  padding: 1rem;
+  margin-top: 2rem;
+  background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
   color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 500;
+  border: 1px solid #000;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .submitButton:hover:not(:disabled) {
-  background: #1f2937;
+  background: linear-gradient(180deg, #374151 0%, #1f2937 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.submitButton:active:not(:disabled) {
+  transform: translateY(0px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .submitButton:disabled {
-  background: #9ca3af;
+  background: #f3f4f6;
+  color: #9ca3af;
+  border-color: #e5e7eb;
   cursor: not-allowed;
 }
-
 /* ============================= */
 /* PARAGRAPH */
 /* ============================= */
