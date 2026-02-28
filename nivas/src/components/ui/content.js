@@ -4,7 +4,7 @@ function Content({ status, counter, title, discription, location, time, upvotes,
         <div class="issue-card">
             <div class="issue-image-container">
                 <img
-                    src={image ? `data:image/png;base64,${image}` : "https://via.placeholder.com/400x250"}
+                    src={image}
                     alt={title}
                     className="issue-image"
                 />

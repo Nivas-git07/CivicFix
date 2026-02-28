@@ -16,7 +16,7 @@ import "leaflet.heat";
 
 const areas = [
   {
-    name: "Downtown",
+    name: "avaniyapuram",
     level: "high",
     center: [9.9252, 78.1198],
     reports: 1847,
@@ -32,7 +32,7 @@ const areas = [
     }
   },
   {
-    name: "Chinatown",
+    name: "villapuram",
     level: "moderate",
     center: [9.93, 78.125],
     reports: 650,
@@ -48,7 +48,7 @@ const areas = [
     }
   },
   {
-    name: "Residential Area",
+    name: "periyar bus stand",
     level: "low",
     center: [9.92, 78.11],
     reports: 120,

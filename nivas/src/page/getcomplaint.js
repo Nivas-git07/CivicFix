@@ -9,32 +9,60 @@ export default function TrackComplaint() {
     const [complaintId, setComplaintId] = useState("");
     const [response, setResponse] = useState(null);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
 
-        if (!complaintId.trim()) {
-            alert("Please enter a complaint ID");
-            return;
-        }
+    //     if (!complaintId.trim()) {
+    //         alert("Please enter a complaint ID");
+    //         return;
+    //     }
 
-        try {
-            const res = await fetch(`https://quiz.selfmade.express/complaints/${complaintId}`, {
-                method: "GET",
-                headers: { "Content-Type": "application/json" },
-            });
+    //     try {
+    //         const res = await fetch(`https://quiz.selfmade.express/complaints/${complaintId}`, {
+    //             method: "GET",
+    //             headers: { "Content-Type": "application/json" },
+    //         });
 
-            if (!res.ok) {
-                throw new Error("Complaint not found");
-            }
+    //         if (!res.ok) {
+    //             throw new Error("Complaint not found");
+    //         }
 
-            const data = await res.json();
-            setResponse(data);
-            console.log(data);
-        } catch (err) {
-            alert(err.message);
-        }
-    };
+    //         const data = await res.json();
+    //         setResponse(data);
+    //         console.log(data);
+    //     } catch (err) {
+    //         alert(err.message);
+    //     }
+    // };
+const handleSubmit = (e) => {
+  e.preventDefault();
 
+  if (!complaintId.trim()) {
+    alert("Please enter a complaint ID");
+    return;
+  }
+
+  // ✅ Default complaint data
+  const defaultData = {
+    status: "In Progress",
+    complaint_id: complaintId, // use user input
+    time: "Today, 3:45 PM",
+    category: "Garbage Overflow",
+    last_updated: "10 minutes ago",
+    location: "Anna Nagar, Madurai",
+    district: "Madurai Corporation",
+    description:
+      "Garbage bins are overflowing near the main road causing bad smell and inconvenience to residents.",
+    image: null,
+    timeline: [
+      "Complaint Submitted",
+      "Assigned to Sanitation Department",
+      "Cleaning Scheduled",
+    ],
+  };
+
+  setResponse(defaultData);
+};
     return (
         <div>
             <Navbar />
@@ -72,7 +100,7 @@ export default function TrackComplaint() {
                         
                     </form>
 
-                    <ComplaintDetails response={response} />
+                   {response && <ComplaintDetails response={response} />}
 
                 </main>
 
