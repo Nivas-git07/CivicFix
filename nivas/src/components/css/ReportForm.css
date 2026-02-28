@@ -15,6 +15,42 @@ body {
   color: #111827;
   line-height: 1.5;
 }
+/* ============================= */
+/* LOCATION INFO DISPLAY */
+/* ============================= */
+
+.locationInfoBox {
+  background: #f9fafb;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.placeTypeRow {
+  margin-top: 6px;
+}
+
+/* 🚫 Residential (Red) */
+.residentialBadge {
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  margin-left: 5px;
+}
+
+/* ✅ Public Area (Green) */
+.publicBadge {
+  background: #dcfce7;
+  color: #166534;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  margin-left: 5px;
+}
 
 /* ============================= */
 /* NAVBAR */
@@ -168,135 +204,6 @@ h1 {
   font-size: 0.85rem;
   color: #6b7280;
 }
-/* ============================= */
-/* CAMERA STYLE UPLOAD */
-/* ============================= */
-
-.uploadWrapper {
-  margin-bottom: 1.8rem;
-}
-
-.uploadCard {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2.5rem 1rem;
-  border-radius: 18px;
-  background: #f3f4f6;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  border: 2px dashed #d1d5db;
-}
-
-.uploadCard:hover {
-  background: #e5e7eb;
-  border-color: #111827;
-}
-
-.uploadIconWrapper {
-  position: relative;
-  font-size: 3.5rem;
-  color: #111827;
-}
-
-.cameraIcon {
-  font-size: 4rem;
-}
-
-.uploadArrow {
-  position: absolute;
-  bottom: -5px;
-  right: -5px;
-  font-size: 1.5rem;
-  background: #111827;
-  color: #ffffff;
-  border-radius: 50%;
-  padding: 6px 10px;
-  font-size: 0.9rem;
-}
-
-.uploadLabel {
-  margin-top: 1rem;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #374151;
-  text-align: center;
-}
-/* ============================= */
-/* PREMIUM FILE UPLOAD */
-/* ============================= */
-/* ============================= */
-/* LARGE CENTER IMAGE PREVIEW */
-/* ============================= */
-
-.imagePreviewWrapper {
-  margin-top: 1.5rem;
-  display: flex;
-  justify-content: center;
-}
-
-.imagePreviewLarge {
-  width: 100%;
-  max-width: 500px;
-  max-height: 350px;
-  object-fit: cover;
-  border-radius: 14px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-  transition: transform 0.25s ease;
-}
-
-.imagePreviewLarge:hover {
-  transform: scale(1.02);
-}
-
-/* ============================= */
-/* SOLID BLACK & WHITE BUTTONS */
-/* ============================= */
-
-.locationButtons {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.locationBtn {
-  flex: 1;
-  padding: 0.85rem;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-/* Solid Black */
-.blackBtn {
-  background: #2258cd;
-  color: #0d0909;
-}
-
-.blackBtn:hover {
-  background: #111111;
-}
-
-/* Dark Gray (visible but different) */
-.grayBtn {
-  background: #2d2d2d;
-  color: #ffffff;
-}
-
-.grayBtn:hover {
-  background: #000000;
-}
-
-.locationBtn:active {
-  transform: scale(0.97);
-}
-/* ============================= */
-/* PREMIUM LOCATION BUTTONS */
-/* ============================= */
 
 /* ============================= */
 /* IMAGE PREVIEW */

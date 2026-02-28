@@ -11,30 +11,79 @@ export default function ReportForm() {
   const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [fileName, setFileName] = useState("No file selected");
+  const [placeType, setPlaceType] = useState(null);
 
   const [coords, setCoords] = useState(null);
   const [showMap, setShowMap] = useState(false);
 
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
+  /* ===============================
+   🔍 Reverse Geocoding + Validation
+================================ */
+
+const checkLocationType = async (lat, lng) => {
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+    );
+
+    const data = await res.json();
+
+    const locationClass = data.class;
+    const locationType = data.type;
+
+    console.log("Class:", locationClass);
+    console.log("Type:", locationType);
+
+    setPlaceType(locationType);
+
+    // 🚨 BLOCK PRIVATE RESIDENTIAL
+   // 🚨 BLOCK PRIVATE / HOME RELATED AREAS
+const blockedTypes = [
+  "residential",
+  "apartments",
+  "house",
+  "living_street",
+  "service",
+];
+
+if (blockedTypes.includes(locationType)) {
+  alert(
+    "⚠️ This appears to be a private residential or housing street.\nPlease report only public civic issues."
+  );
+  return false;
+}
+
+    return true;
+  } catch (error) {
+    console.error("Reverse geocode failed:", error);
+    return true; // allow if API fails
+  }
+};
 
   // 📍 Live Location
-  const handleLiveLocation = () => {
-    if (!navigator.geolocation) {
-      alert("Geolocation not supported");
-      return;
-    }
+ const handleLiveLocation = () => {
+  if (!navigator.geolocation) {
+    alert("Geolocation not supported");
+    return;
+  }
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-        setCoords({ lat, lng });
-        alert("Live location shared successfully!");
-      },
-      () => alert("Location permission denied")
-    );
-  };
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+
+      const isAllowed = await checkLocationType(lat, lng);
+
+      if (!isAllowed) return;
+
+      setCoords({ lat, lng });
+      alert("Live location shared successfully!");
+    },
+    () => alert("Location permission denied")
+  );
+};
 
   // 📌 Pin Location
   const handlePinLocation = () => {
@@ -245,11 +294,33 @@ formData.append("longitude", coords?.lng || "");
           />
 
           {/* Show Selected Coords */}
-          {coords && (
-            <div className="text-sm text-gray-600 mb-3">
-              Lat: {coords.lat} | Lng: {coords.lng}
-            </div>
-          )}
+         {coords && (
+  <div className="locationInfoBox">
+    <div>
+      <strong>Latitude:</strong> {coords.lat}
+    </div>
+    <div>
+      <strong>Longitude:</strong> {coords.lng}
+    </div>
+
+    {placeType && (
+      <div className="placeTypeRow">
+        <strong>Location Type:</strong>{" "}
+        <span
+          className={
+            placeType === "residential" ||
+            placeType === "apartments" ||
+            placeType === "house"
+              ? "residentialBadge"
+              : "publicBadge"
+          }
+        >
+          {placeType}
+        </span>
+      </div>
+    )}
+  </div>
+)}
 
          
 
@@ -265,11 +336,12 @@ formData.append("longitude", coords?.lng || "");
 
       {/* Map Modal */}
       {showMap && (
-        <PinMapModal
-          setCoords={setCoords}
-          onClose={() => setShowMap(false)}
-        />
-      )}
+  <PinMapModal
+    setCoords={setCoords}
+    onClose={() => setShowMap(false)}
+    checkLocationType={checkLocationType}
+  />
+)}
     </div>
   );
 }

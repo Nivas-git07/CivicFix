@@ -14,12 +14,18 @@ L.Icon.Default.mergeOptions({
     "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
 
-function LocationMarker({ setCoords }) {
+function LocationMarker({ setCoords, checkLocationType }) {
   const [position, setPosition] = useState(null);
 
   useMapEvents({
-    click(e) {
+    async click(e) {
       const { lat, lng } = e.latlng;
+
+      // 🔍 Validate Location
+      const isAllowed = await checkLocationType(lat, lng);
+
+      if (!isAllowed) return;
+
       setPosition([lat, lng]);
       setCoords({ lat, lng });
     },
@@ -28,7 +34,7 @@ function LocationMarker({ setCoords }) {
   return position ? <Marker position={position} /> : null;
 }
 
-export default function PinMapModal({ onClose, setCoords }) {
+export default function PinMapModal({ onClose, setCoords, checkLocationType })  {
   return (
     <div style={overlayStyle}>
       <div style={modalStyle}>
@@ -43,7 +49,10 @@ export default function PinMapModal({ onClose, setCoords }) {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution="© OpenStreetMap contributors"
           />
-          <LocationMarker setCoords={setCoords} />
+         <LocationMarker 
+  setCoords={setCoords} 
+  checkLocationType={checkLocationType}
+/>
         </MapContainer>
 
         <button style={buttonStyle} onClick={onClose}>
