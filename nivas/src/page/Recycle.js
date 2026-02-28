@@ -35,6 +35,7 @@ export default function RecycleSmartMap() {
   const [route, setRoute] = useState([]);
   const [imagePreview, setImagePreview] = useState(null);
   const [locationError, setLocationError] = useState("");
+
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371; // Earth radius in KM
     const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -43,9 +44,9 @@ export default function RecycleSmartMap() {
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos((lat1 * Math.PI) / 180) *
-        Math.cos((lat2 * Math.PI) / 180) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
@@ -197,11 +198,38 @@ export default function RecycleSmartMap() {
                 <input
                   type="file"
                   style={{ display: "none" }}
-                  onChange={(e) => {
+                  onChange={async (e) => {
                     const file = e.target.files[0];
-                    if (file) {
-                      setImagePreview(URL.createObjectURL(file));
-                      detectMaterial();
+                    if (!file) return;
+
+                    setImagePreview(URL.createObjectURL(file));
+
+                    // 🔥 SEND IMAGE TO N8N
+                    const formData = new FormData();
+                    formData.append("image", file); // parameter name = image
+
+                    try {
+                      const response = await fetch(
+                        "https://civicfix.app.n8n.cloud/webhook/d99da71e-0cf7-4a0a-b9f7-47c55a9a4f92",
+                        {
+                          method: "POST",
+                          body: formData,
+                        }
+                      );
+
+                      const result = await response.json();
+
+                      console.log("AI Response:", result);
+
+                      if (result.status === "valid") {
+                        setMaterial(result.category);
+                      } else {
+                        alert("Invalid image: " + result.reason);
+                      }
+
+                    } catch (error) {
+                      console.error("Upload error:", error);
+                      alert("Failed to process image.");
                     }
                   }}
                 />
