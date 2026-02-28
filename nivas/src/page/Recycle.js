@@ -354,6 +354,8 @@ const modalStyle = {
   width: "380px",
   textAlign: "center",
   boxShadow: "0 30px 60px rgba(0,0,0,0.25)",
+   maxHeight: "90vh",        // ✅ Prevent overflow
+  overflowY: "auto",
 };
 
 const titleStyle = {
