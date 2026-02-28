@@ -64,7 +64,7 @@ function Navbar() {
                   alt="User Avatar"
                   className="w-8 h-8 rounded-full border"
                 />
-                <Link to="#" className="nav-link">user</Link>
+                <Link to="#" className="nav-link">Saravanesh</Link>
               </>
             {/* ) : (
               // <span className="text-gray-500">Loading...</span>  
