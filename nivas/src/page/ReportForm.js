@@ -1,7 +1,6 @@
 import React, { useState, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
 import Navbar from "../components/ui/nav";
-import { useNavigate } from "react-router-dom";
 import PinMapModal from "./PinMapModel";
 
 export default function ReportForm() {
@@ -10,201 +9,162 @@ export default function ReportForm() {
   const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [fileName, setFileName] = useState("No file selected");
   const [placeType, setPlaceType] = useState(null);
-
   const [coords, setCoords] = useState(null);
   const [showMap, setShowMap] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   const fileInputRef = useRef(null);
-  const navigate = useNavigate();
+
   /* ===============================
-   🔍 Reverse Geocoding + Validation
-================================ */
+     HANDLE FILE (Drag or Click)
+  =============================== */
 
-const checkLocationType = async (lat, lng) => {
-  try {
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
-    );
+  const handleFile = async (file) => {
+    setPhotoFile(file);
 
-    const data = await res.json();
+    // Optional AI check
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
 
-    const locationClass = data.class;
-    const locationType = data.type;
+      const response = await fetch(
+        "https://civicfix.app.n8n.cloud/webhook/71fa5cc2-2978-43f6-85e7-82e34fb8f009",
+        { method: "POST", body: formData }
+      );
 
-    console.log("Class:", locationClass);
-    console.log("Type:", locationType);
+      if (!response.ok) return;
 
-    setPlaceType(locationType);
+      const result = await response.json();
+      const aiText = result?.[0]?.content?.parts?.[0]?.text;
 
-    // 🚨 BLOCK PRIVATE RESIDENTIAL
-   // 🚨 BLOCK PRIVATE / HOME RELATED AREAS
-const blockedTypes = [
-  "residential",
-  "apartments",
-  "house",
-  "living_street",
-  "service",
-];
+      if (!aiText) return;
 
-if (blockedTypes.includes(locationType)) {
-  alert(
-    "⚠️ This appears to be a private residential or housing street.\nPlease report only public civic issues."
-  );
-  return false;
-}
+      const cleaned = aiText
+        .replace(/```json/g, "")
+        .replace(/```/g, "")
+        .trim();
 
-    return true;
-  } catch (error) {
-    console.error("Reverse geocode failed:", error);
-    return true; // allow if API fails
-  }
-};
+      const parsed = JSON.parse(cleaned);
 
-  // 📍 Live Location
- const handleLiveLocation = () => {
-  if (!navigator.geolocation) {
-    alert("Geolocation not supported");
-    return;
-  }
+      if (parsed.category === "invalid") {
+        alert("⚠️ Please upload a valid civic issue image.");
+        setPhotoFile(null);
+        return;
+      }
 
-  navigator.geolocation.getCurrentPosition(
-    async (position) => {
-      const lat = position.coords.latitude;
-      const lng = position.coords.longitude;
+      if (parsed.category) {
+        setIssueType(parsed.category);
+      }
 
-      const isAllowed = await checkLocationType(lat, lng);
-
-      if (!isAllowed) return;
-
-      setCoords({ lat, lng });
-      alert("Live location shared successfully!");
-    },
-    () => alert("Location permission denied")
-  );
-};
-
-  // 📌 Pin Location
-  const handlePinLocation = () => {
-    setShowMap(true);
+      if (parsed.latitude && parsed.longitude) {
+        setCoords({
+          lat: parsed.latitude,
+          lng: parsed.longitude,
+        });
+      }
+    } catch (err) {
+      console.log("AI check failed (optional)", err);
+    }
   };
 
-const onPhotoChange = async (e) => {
-  const file = e.target.files?.[0];
-  if (!file) return;
+  /* ===============================
+     REVERSE GEOCODE VALIDATION
+  =============================== */
 
-  setPhotoFile(file);
-  setFileName(file.name);
+  const checkLocationType = async (lat, lng) => {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+      );
+      const data = await res.json();
 
-  try {
-    const formData = new FormData();
-    formData.append("image", file);
+      const locationType = data.type;
+      setPlaceType(locationType);
 
-    const response = await fetch(
-      "https://civicfix.app.n8n.cloud/webhook/71fa5cc2-2978-43f6-85e7-82e34fb8f009",
-      {
-        method: "POST",
-        body: formData,
+      const blockedTypes = [
+        "residential",
+        "apartments",
+        "house",
+        "living_street",
+        "service",
+      ];
+
+      if (blockedTypes.includes(locationType)) {
+        alert(
+          "⚠️ This appears to be a private residential area.\nPlease report only public civic issues."
+        );
+        return false;
       }
-    );
 
-    if (!response.ok) {
-      const text = await response.text();
-      console.error("Server error:", text);
+      return true;
+    } catch (err) {
+      console.error("Reverse geocode failed:", err);
+      return true;
+    }
+  };
+
+  /* ===============================
+     LIVE LOCATION
+  =============================== */
+
+  const handleLiveLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation not supported");
       return;
     }
 
-    const result = await response.json();
-    console.log("n8n raw response:", result);
-    
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
 
-    // ✅ Extract AI text
-    const aiText = result?.[0]?.content?.parts?.[0]?.text;
+      const allowed = await checkLocationType(lat, lng);
+      if (!allowed) return;
 
-    if (!aiText) return;
+      setCoords({ lat, lng });
+    });
+  };
 
-    // ✅ Remove ```json wrapper
-    const cleaned = aiText
-      .replace(/```json/g, "")
-      .replace(/```/g, "")
-      .trim();
-
-    const parsed = JSON.parse(cleaned);
-
-    console.log("Parsed AI result:", parsed);
-    alert(`AI detected category: ${parsed.category || "None"}`);
-    
-
-   
-   // ✅ If AI says image is invalid
-if (parsed.category === "invalid") {
-  alert("⚠️ Please upload a correct image related to civic issue.");
-  setIssueType("");
-  return; // stop further execution
-}
-
-// ✅ If AI detected valid category
-if (parsed.category) {
-  setIssueType(parsed.category);
-}
-
-    // ✅ If AI provided coordinates
-    if (parsed.latitude && parsed.longitude) {
-      setCoords({
-        lat: parsed.latitude,
-        lng: parsed.longitude,
-      });
-
-      alert("📍 Location detected from image!");
-    }
-
-  } catch (error) {
-    console.error("Upload failed:", error);
-  }
-};
+  /* ===============================
+     SUBMIT
+  =============================== */
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!photoFile) {
+      alert("Upload photo first");
+      return;
+    }
+
+    if (!coords) {
+      alert("Select location first");
+      return;
+    }
+
     setSubmitting(true);
 
+    const formData = new FormData();
+    formData.append("id", uuidv4());
+    formData.append("issueType", issueType);
+    formData.append("photo", photoFile);
+    formData.append("description", description);
+    formData.append("latitude", coords.lat);
+    formData.append("longitude", coords.lng);
+
     try {
-      if (!photoFile) {
-        alert("Please upload a photo.");
-        return;
-      }
-
-      if (!coords) {
-        alert("Please select a location (Live or Pin).");
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append("id", uuidv4());
-      formData.append("issueType", issueType);
-      formData.append("photo", photoFile);
-      formData.append("location", location);
-      formData.append("description", description);
-     formData.append("latitude", coords?.lat || "");
-formData.append("longitude", coords?.lng || "");
-
-
       const token = localStorage.getItem("token");
 
       const response = await fetch(
         "https://quiz.selfmade.express/api/report",
         {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
           body: formData,
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Submission failed");
-      }
+      if (!response.ok) throw new Error("Submission failed");
 
       alert("Report submitted successfully!");
     } catch (err) {
@@ -213,6 +173,10 @@ formData.append("longitude", coords?.lng || "");
       setSubmitting(false);
     }
   };
+
+  /* ===============================
+     UI
+  =============================== */
 
   return (
     <div>
@@ -227,121 +191,171 @@ formData.append("longitude", coords?.lng || "");
           onSubmit={handleSubmit}
           className="bg-white shadow-lg rounded-lg p-6 w-full max-w-[600px]"
         >
-          {/* Issue Type */}
-         
+          {/* DRAG & DROP */}
+          {/* <div
+            className={`dragUploadBox ${
+              isDragging ? "dragActive" : ""
+            }`}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setIsDragging(true);
+            }}
+            onDragLeave={() => setIsDragging(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setIsDragging(false);
+              const file = e.dataTransfer.files[0];
+              if (file) handleFile(file);
+            }}
+            onClick={() => fileInputRef.current.click()}
+          >
+            <div className="cameraIcon">📷</div>
+            <p>Drag & Drop Image Here</p>
+            <p className="text-sm text-gray-500">
+              or click to browse
+            </p>
 
-          {/* Photo Upload */}
- <div className="uploadWrapper">
-  <label className="uploadCard">
-    <div className="uploadIconWrapper">
-      <div className="cameraIcon">📷</div>
-      <div className="uploadArrow">⬆</div>
-    </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              hidden
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) handleFile(file);
+              }}
+            />
+          </div> */}
+          {/* BIG DRAG & DROP AREA */}
+<div
+  className={`bigUploadBox ${isDragging ? "dragActive" : ""}`}
+  onDragOver={(e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  }}
+  onDragLeave={() => setIsDragging(false)}
+  onDrop={(e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  }}
+  onClick={() => fileInputRef.current.click()}
+>
+  <div className="bigUploadContent">
+    
 
-    <p className="uploadLabel">
-      {fileName === "No file selected"
-        ? "Upload Issue Image"
-        : fileName}
+    {/* <h3 className="bigUploadTitle">
+      Drop your civic issue image here
+    </h3> */}
+    <h3 className="bigUploadTitle">
+  {photoFile
+    ? "✅ Image Selected Successfully"
+    : isDragging
+    ? "📂 Release to Upload"
+    : "📸 Drag & Drop Your Civic Issue Image"}
+</h3>
+
+    <p className="bigUploadSub">
+      PNG, JPG up to 10MB
     </p>
 
-    <input
-      type="file"
-      accept="image/*"
-      ref={fileInputRef}
-      onChange={onPhotoChange}
-      required
-      hidden
-    />
-  </label>
-</div>
-
-   {photoFile && (
-  <div className="flex justify-center mb-6">
-    <img
-      src={URL.createObjectURL(photoFile)}
-      alt="Preview"
-      className="w-full max-w-[450px] h-[280px] object-cover rounded-xl shadow-md border border-gray-200"
-    />
+    <button
+      type="button"
+      className="browseBtn"
+      onClick={() => fileInputRef.current.click()}
+    >
+      Browse Files
+    </button>
   </div>
-)}
 
-          {/* Location Options */}
-<div className="locationButtons">
-  <button
-    type="button"
-    onClick={handleLiveLocation}
-    className="locationBtn blackBtn"
-  >
-    📍 Share Live Location
-  </button>
-
-  <button
-    type="button"
-    onClick={handlePinLocation}
-    className="locationBtn grayBtn"
-  >
-    📌 Pin Location
-  </button>
+  <input
+    ref={fileInputRef}
+    type="file"
+    hidden
+    accept="image/*"
+    onChange={(e) => {
+      const file = e.target.files[0];
+      if (file) handleFile(file);
+    }}
+  />
 </div>
 
-          {/* Manual Address */}
-          <input
-            type="text"
-            placeholder="Or type address manually"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            className="w-full border p-2 rounded mb-3"
+          {/* PREVIEW */}
+          {photoFile && (
+            <div className="flex justify-center mt-4">
+              <img
+                src={URL.createObjectURL(photoFile)}
+                alt="preview"
+                className="w-full max-w-[450px] h-[280px] object-cover rounded-xl shadow-md"
+              />
+            </div>
+          )}
+
+          {/* LOCATION BUTTONS */}
+          <div className="locationButtons mt-6">
+            <button
+              type="button"
+              onClick={handleLiveLocation}
+              className="locationBtn blackBtn"
+            >
+              📍 Live Location
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowMap(true)}
+              className="locationBtn grayBtn"
+            >
+              📌 Pin Location
+            </button>
+          </div>
+
+          {/* COORDS DISPLAY */}
+          {coords && (
+            <div className="locationInfoBox mt-4">
+              <p>
+                <strong>Lat:</strong> {coords.lat}
+              </p>
+              <p>
+                <strong>Lng:</strong> {coords.lng}
+              </p>
+              {placeType && (
+                <p>
+                  <strong>Type:</strong>{" "}
+                  {placeType}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* DESCRIPTION */}
+          <textarea
+            placeholder="Describe the issue..."
+            value={description}
+            onChange={(e) =>
+              setDescription(e.target.value)
+            }
+            className="w-full border p-2 rounded mt-4"
           />
-
-          {/* Show Selected Coords */}
-         {coords && (
-  <div className="locationInfoBox">
-    <div>
-      <strong>Latitude:</strong> {coords.lat}
-    </div>
-    <div>
-      <strong>Longitude:</strong> {coords.lng}
-    </div>
-
-    {placeType && (
-      <div className="placeTypeRow">
-        <strong>Location Type:</strong>{" "}
-        <span
-          className={
-            placeType === "residential" ||
-            placeType === "apartments" ||
-            placeType === "house"
-              ? "residentialBadge"
-              : "publicBadge"
-          }
-        >
-          {placeType}
-        </span>
-      </div>
-    )}
-  </div>
-)}
-
-         
 
           <button
             type="submit"
             disabled={submitting}
-            className="w-full bg-black text-white py-2 rounded"
+            className="w-full bg-black text-white py-2 rounded mt-6"
           >
             {submitting ? "Submitting..." : "Submit Report"}
           </button>
         </form>
       </div>
 
-      {/* Map Modal */}
       {showMap && (
-  <PinMapModal
-    setCoords={setCoords}
-    onClose={() => setShowMap(false)}
-    checkLocationType={checkLocationType}
-  />
-)}
+        <PinMapModal
+          setCoords={setCoords}
+          onClose={() => setShowMap(false)}
+          checkLocationType={checkLocationType}
+        />
+      )}
     </div>
   );
 }

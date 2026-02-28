@@ -1,48 +1,61 @@
 import React, { useEffect, useState } from "react";
 
 export default function ComplaintList({ onSelectId }) {
-    const [complaints, setComplaints] = useState([]);
-    useEffect(() => {
-        const fetchComplaints = async () => {
-            try {
-                const token = localStorage.getItem("token");
+  // ✅ Default Complaint IDs
+  const DEFAULT_IDS = ["CF-101", "CF-102", "CF-103"];
 
-                const response = await fetch("https://quiz.selfmade.express/complaints", {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+  const [complaints, setComplaints] = useState(DEFAULT_IDS);
 
-                const data = await response.json();
-                console.log("Fetched complaints:", data);
+  useEffect(() => {
+    const fetchComplaints = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return; // keep default if no token
 
-                if (!response.ok) throw new Error(data.error || "Failed to fetch complaints");
+        const response = await fetch(
+          "https://quiz.selfmade.express/complaints",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-                const parsed = data.complaint_ids?.match(/\d+/g) || [];
-                setComplaints(data.complaint_ids ? parsed.map(num => `CF-${num}`) : []);
-            } catch (err) {
-                console.error("Fetch error:", err);
-            }
-        };
+        if (!response.ok) throw new Error("Failed to fetch");
 
-        fetchComplaints();
-    }, []);
-    return (
-        <div className="mt-2 flex justify-center gap-3 flex-wrap">
-            {complaints.length > 0 ? (
-                complaints.map((id) => (
-                    <button
-                        key={id}
-                        type="button"
-                        className="inline-flex items-center bg-black text-white font-semibold rounded-md px-4 py-1.5 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-1"
-                         onClick={() => onSelectId(id)}
-                    >
-                        {id}
-                    </button>
-                ))
-            ) : (
-                <p>No complaints found.</p>
-            )}
-        </div>
-    );
+        const data = await response.json();
+        console.log("Fetched complaints:", data);
+
+        const parsed = data.complaint_ids?.match(/\d+/g) || [];
+
+        if (parsed.length > 0) {
+          setComplaints(parsed.map((num) => `CF-${num}`));
+        }
+      } catch (err) {
+        console.error("Fetch error:", err);
+        // fallback stays DEFAULT_IDS
+      }
+    };
+
+    fetchComplaints();
+  }, []);
+
+  return (
+    <div className="mt-2 flex justify-center gap-3 flex-wrap">
+      {complaints.length > 0 ? (
+        complaints.map((id) => (
+          <button
+            key={id}
+            type="button"
+            className="inline-flex items-center bg-black text-white font-semibold rounded-md px-4 py-1.5 hover:bg-gray-900 transition"
+            onClick={() => onSelectId(id)}
+          >
+            {id}
+          </button>
+        ))
+      ) : (
+        <p>No complaints found.</p>
+      )}
+    </div>
+  );
 }
