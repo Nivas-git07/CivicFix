@@ -18,7 +18,6 @@ requiredEnv.forEach((key) => {
   }
 });
 
-
 const pool = new Pool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -72,7 +71,6 @@ async function generateUniqueComplaintId() {
   } while (exists);
   return id;
 }
-
 
 router.get('/api/health', (_req, res) => {
   res.json({ ok: true });
