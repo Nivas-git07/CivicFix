@@ -10,7 +10,7 @@ export default function ComplaintList({ onSelectId }) {
     const fetchComplaints = async () => {
       try {
         const token = localStorage.getItem("token");
-        if (!token) return; // keep default if no token
+        if (!token) return; 
 
         const response = await fetch(
           "https://quiz.selfmade.express/complaints",
@@ -24,16 +24,23 @@ export default function ComplaintList({ onSelectId }) {
         if (!response.ok) throw new Error("Failed to fetch");
 
         const data = await response.json();
-        console.log("Fetched complaints:", data);
+        
+        // Handling potential different data structures from backend
+        const rawIds = data.complaint_ids || data;
+        let parsed = [];
 
-        const parsed = data.complaint_ids?.match(/\d+/g) || [];
+        if (typeof rawIds === 'string') {
+            parsed = rawIds.match(/\d+/g) || [];
+        } else if (Array.isArray(rawIds)) {
+            parsed = rawIds;
+        }
 
         if (parsed.length > 0) {
-          setComplaints(parsed.map((num) => `CF-${num}`));
+          // Ensure they follow the CF-XXX format
+          setComplaints(parsed.map((id) => id.toString().startsWith("CF-") ? id : `CF-${id}`));
         }
       } catch (err) {
         console.error("Fetch error:", err);
-        // fallback stays DEFAULT_IDS
       }
     };
 
@@ -47,14 +54,15 @@ export default function ComplaintList({ onSelectId }) {
           <button
             key={id}
             type="button"
-            className="inline-flex items-center bg-black text-white font-semibold rounded-md px-4 py-1.5 hover:bg-gray-900 transition"
+            className="group relative flex items-center gap-2 bg-white border-2 border-gray-100 text-gray-700 font-bold rounded-xl px-4 py-2 hover:border-black hover:text-black transition-all active:scale-95 shadow-sm"
             onClick={() => onSelectId(id)}
           >
+            <span className="w-2 h-2 bg-blue-500 rounded-full group-hover:animate-ping"></span>
             {id}
           </button>
         ))
       ) : (
-        <p>No complaints found.</p>
+        <p className="text-sm text-gray-400 italic">No recent complaints found.</p>
       )}
     </div>
   );
