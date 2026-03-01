@@ -7,6 +7,10 @@ import Search from "../components/ui/search";
 import Report from "../components/ui/report";
 import Content from "../components/ui/content";
 import drain from "../components/image/drain.jpeg";
+import garbage from "../components/image/drainage.png";
+import porthole from "../components/image/porthole.jpg";
+import streetlight from "../components/image/streetlight.png";
+
 const defaultComplaints = [
   {
     id: 1,
@@ -20,7 +24,7 @@ const defaultComplaints = [
     like: 4,
     comment: 6,
     complaint_id: "CIV-1001",
-    image: "https://images.unsplash.com/photo-1600320254374-ce2d293c324e",
+    image: porthole,
   },
   {
     id: 2,
@@ -34,7 +38,7 @@ const defaultComplaints = [
     like: 3,
     comment: 12,
     complaint_id: "CIV-1002",
-    image: "https://images.unsplash.com/photo-1581579185169-1f1b9a6e13b6",
+    image: drain,
   },
   {
     id: 3,
@@ -48,7 +52,7 @@ const defaultComplaints = [
     like: 2,
     comment: 3,
     complaint_id: "CIV-1003",
-    image: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29",
+    image: streetlight,
   },
   {
     id: 4,
@@ -62,7 +66,7 @@ const defaultComplaints = [
     like: 5,
     comment: 20,
     complaint_id: "CIV-1004",
-    image: "https://images.unsplash.com/photo-1597006023440-7d3f45c7b2c1",
+    image: garbage,
   },
 ];
 
@@ -108,8 +112,11 @@ export default function Home() {
               disvotes={c.like}
               comment={c.comment}
               issueid={c.complaint_id}
-              image={drain}
+              image={c.image}
             />
+            
+          
+
           ))}
         </div>
       </main>

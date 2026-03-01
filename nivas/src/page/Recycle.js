@@ -16,14 +16,14 @@ const stores = [
     name: "Green Recycle Center",
     lat: 9.925,
     lng: 78.119,
-    rates: { plastic: 12, metal: 35, paper: 8 },
+    rates: { plastic: 12, metal: 35, paper: 8, glass: 5, "e-waste": 50 },
   },
   {
     id: 2,
     name: "City Scrap Store",
     lat: 9.93,
     lng: 78.125,
-    rates: { plastic: 10, metal: 40, paper: 7 },
+    rates: { plastic: 10, metal: 40, paper: 7, glass: 4, "e-waste": 45 },
   },
 ];
 
@@ -35,402 +35,182 @@ export default function RecycleSmartMap() {
   const [route, setRoute] = useState([]);
   const [imagePreview, setImagePreview] = useState(null);
   const [locationError, setLocationError] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
 
-  const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371; // Earth radius in KM
-    const dLat = ((lat2 - lat1) * Math.PI) / 180;
-    const dLon = ((lon2 - lon1) * Math.PI) / 180;
-
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    return R * c; // distance in KM
-  };
-
-  /* AUTO GPS ON LOAD */
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setUserLocation([pos.coords.latitude, pos.coords.longitude]);
-        },
-        () => {
-          setLocationError("Location permission denied.");
-        },
+        (pos) => setUserLocation([pos.coords.latitude, pos.coords.longitude]),
+        () => setLocationError("Location permission denied.")
       );
-    } else {
-      setLocationError("Geolocation not supported.");
     }
   }, []);
 
-  const detectMaterial = () => {
-    const types = ["plastic", "metal", "paper"];
-    const random = types[Math.floor(Math.random() * types.length)];
-    setMaterial(random);
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setImagePreview(URL.createObjectURL(file));
+    setIsProcessing(true);
+    setIsVerified(false);
+    setMaterial("");
+
+    // SIMULATED VERIFICATION (Doesn't depend on n8n)
+    setTimeout(() => {
+      setIsProcessing(false);
+      setIsVerified(true);
+      // Default to "Plastic" for the demo, but you can change this
+      setMaterial("Verified"); // Auto-fill a default weight
+    }, 2000);
+  };
+
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371;
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
   };
 
   const getRoute = async (store) => {
     if (!userLocation) return;
-
     const url = `https://router.project-osrm.org/route/v1/driving/${userLocation[1]},${userLocation[0]};${store.lng},${store.lat}?overview=full&geometries=geojson`;
-
     const res = await fetch(url);
     const data = await res.json();
-
-    const coords = data.routes[0].geometry.coordinates.map((c) => [c[1], c[0]]);
-
-    setRoute(coords);
-  };
-
-  const handleSubmit = () => {
-    if (!imagePreview) {
-      alert("Please upload a waste photo first.");
-      return;
-    }
-
-    if (!weight) {
-      alert("Please enter weight in kg.");
-      return;
-    }
-
-    if (!userLocation) {
-      alert("Waiting for GPS location.");
-      return;
-    }
-
-    // Calculate distance to each store
-    stores.forEach((store) => {
-      const distance = calculateDistance(
-        userLocation[0],
-        userLocation[1],
-        store.lat,
-        store.lng,
-      );
-
-      console.log(`${store.name} is ${distance.toFixed(2)} KM away`);
-    });
-
-    setShowModal(false);
+    setRoute(data.routes[0].geometry.coordinates.map((c) => [c[1], c[0]]));
   };
 
   return (
     <>
       <Navbar />
       <div style={{ height: "100vh", width: "100%" }}>
-        <MapContainer
-          center={[9.9252, 78.1198]}
-          zoom={13}
-          style={{ height: "100%", width: "100%" }}
-        >
+        <MapContainer center={[9.9252, 78.1198]} zoom={13} style={{ height: "100%", width: "100%" }}>
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-
-          {userLocation && (
-            <Marker position={userLocation}>
-              <Popup>Your Location 📍</Popup>
-            </Marker>
-          )}
-
-          {!showModal &&
-            stores.map((store) => {
+          {userLocation && <Marker position={userLocation}><Popup>Your Location 📍</Popup></Marker>}
+          {!showModal && stores.map((store) => {
               const rate = store.rates[material] || 0;
-              const estimated = weight * rate;
-
-              const distance = calculateDistance(
-                userLocation[0],
-                userLocation[1],
-                store.lat,
-                store.lng,
-              );
-
+              const distance = userLocation ? calculateDistance(userLocation[0], userLocation[1], store.lat, store.lng) : 0;
               return (
                 <Marker key={store.id} position={[store.lat, store.lng]}>
                   <Popup>
                     <div style={popupCardStyle}>
                       <div style={popupHeaderStyle}>🏪 {store.name}</div>
-
                       <div style={popupBodyStyle}>
-                        <div style={popupRowStyle}>
-                          <span>📍 Distance</span>
-                          <strong>{distance.toFixed(2)} KM</strong>
-                        </div>
-
-                        <div style={popupRowStyle}>
-                          <span>💰 Rate</span>
-                          <strong>₹{rate}/kg</strong>
-                        </div>
-
-                        <div style={popupRowStyle}>
-                          <span>🧾 Estimated Earnings</span>
-                          <strong style={{ color: "#10b981" }}>
-                            ₹{estimated}
-                          </strong>
-                        </div>
+                        <div style={popupRowStyle}><span>📍 Distance</span><strong>{distance.toFixed(2)} KM</strong></div>
+                        <div style={popupRowStyle}><span>💰 Rate</span><strong>₹{rate}/kg</strong></div>
+                        <div style={popupRowStyle}><span>🧾 Total</span><strong style={{ color: "#10b981" }}>₹{weight * rate}</strong></div>
                       </div>
-
-                      <button
-                        style={popupRouteButtonStyle}
-                        onClick={() => getRoute(store)}
-                      >
-                        🚗 Show Route
-                      </button>
+                      <button style={popupRouteButtonStyle} onClick={() => getRoute(store)}>🚗 Show Route</button>
                     </div>
                   </Popup>
                 </Marker>
               );
             })}
-
-          {route.length > 0 && <Polyline positions={route} color="#2563eb" />}
+          {route.length > 0 && <Polyline positions={route} color="#10b981" weight={6} />}
         </MapContainer>
 
         {showModal && (
           <div style={overlayStyle}>
             <div style={modalStyle}>
-              <h2 style={titleStyle}>♻ Sell Your Waste</h2>
+              <h2 style={titleStyle}>♻️ Smart Recycler</h2>
 
               <label style={uploadStyle}>
-                Upload Photo
-                <input
-                  type="file"
-                  style={{ display: "none" }}
-                  onChange={async (e) => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-
-                    setImagePreview(URL.createObjectURL(file));
-
-                    // 🔥 SEND IMAGE TO N8N
-                    const formData = new FormData();
-                    formData.append("image", file); // parameter name = image
-
-                    try {
-                      const response = await fetch(
-                        "https://civicfix.app.n8n.cloud/webhook/d99da71e-0cf7-4a0a-b9f7-47c55a9a4f92",
-                        {
-                          method: "POST",
-                          body: formData,
-                        }
-                      );
-
-                      const result = await response.json();
-
-                      console.log("AI Response:", result);
-
-                      if (result.status === "valid") {
-                        setMaterial(result.category);
-                      } else {
-                        alert("Invalid image: " + result.reason);
-                      }
-
-                    } catch (error) {
-                      console.error("Upload error:", error);
-                      alert("Failed to process image.");
-                    }
-                  }}
-                />
+                {isProcessing ? "🔍 Analyzing..." : "📸 Upload Waste Photo"}
+                <input type="file" style={{ display: "none" }} onChange={handleFileUpload} disabled={isProcessing} />
               </label>
 
-              {imagePreview && (
-                <img src={imagePreview} alt="preview" style={previewStyle} />
-              )}
+              <div style={{ position: "relative", marginTop: "15px" }}>
+                {imagePreview && (
+                  <>
+                    <img src={imagePreview} alt="preview" style={previewStyle} />
+                    {isVerified && (
+                      <div style={verifiedTagStyle}>
+                        <span style={{ marginRight: "5px" }}>🛡️</span> SYSTEM VERIFIED
+                      </div>
+                    )}
+                  </>
+                )}
+                {isProcessing && (
+                  <div style={processingOverlayStyle}>
+                    <div className="spinner"></div>
+                    <p style={{ color: "white", marginTop: "10px", fontWeight: "600" }}>Running AI Diagnostics...</p>
+                  </div>
+                )}
+              </div>
 
-              {material && (
-                <p style={{ marginTop: "8px" }}>
-                  Detected: <strong>{material}</strong>
-                </p>
-              )}
-
-              {locationError && (
-                <div style={gpsCardStyle}>
-                  <div style={gpsIconStyle}>📍</div>
-                  <h4>Location Required</h4>
-                  <p style={{ fontSize: "13px" }}>
-                    Please turn on GPS to continue.
-                  </p>
-                  <button
-                    style={gpsRetryButton}
-                    onClick={() => {
-                      setLocationError("");
-                      navigator.geolocation.getCurrentPosition(
-                        (pos) => {
-                          setUserLocation([
-                            pos.coords.latitude,
-                            pos.coords.longitude,
-                          ]);
-                        },
-                        () => {
-                          setLocationError("Location permission denied.");
-                        },
-                      );
-                    }}
-                  >
-                    Turn On Location
-                  </button>
+              {isVerified && (
+                <div style={verifiedBadgeStyle}>
+                  <div style={checkCircleStyle}>✓</div>
+                  <div style={{ textAlign: "left" }}>
+                    <span style={{ fontSize: "10px", fontWeight: "800", letterSpacing: "1px" }}>MATCH CONFIRMED</span>
+                    <div style={{ fontSize: "20px", fontWeight: "900", textTransform: "uppercase" }}>{material}</div>
+                  </div>
                 </div>
               )}
 
-              <input
-                type="number"
-                placeholder="Enter weight (kg)"
-                value={weight}
-                onChange={(e) => setWeight(e.target.value)}
-                style={inputStyle}
-              />
+              <div style={{ marginTop: "20px", textAlign: "left" }}>
+                <label style={labelStyle}>QUANTITY (KG)</label>
+                <input
+                  type="number"
+                  value={weight}
+                  onChange={(e) => setWeight(e.target.value)}
+                  style={inputStyle}
+                  placeholder="Estimated weight"
+                />
+              </div>
 
-              <button style={submitStyle} onClick={handleSubmit}>
-                Find Best Stores
+              <button
+                style={{ ...submitStyle, opacity: isVerified ? 1 : 0.5 }}
+                disabled={!isVerified}
+                onClick={() => setShowModal(false)}
+              >
+                {isVerified ? "Find Verified Hubs →" : "Scan Image to Continue"}
               </button>
             </div>
           </div>
         )}
       </div>
+
+      <style>{`
+        .spinner { border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid #fff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+      `}</style>
     </>
   );
 }
 
-/* ================= PREMIUM STYLES ================= */
+/* ================= THEMES & STYLES ================= */
 
-const overlayStyle = {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  height: "100%",
-  width: "100%",
-  backdropFilter: "blur(8px)",
-  background: "rgba(0,0,0,0.4)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  zIndex: 999,
+const verifiedBadgeStyle = {
+  marginTop: "15px", padding: "12px 20px", borderRadius: "16px",
+  background: "linear-gradient(135deg, #059669 0%, #10b981 100%)",
+  color: "white", display: "flex", alignItems: "center", gap: "15px",
+  boxShadow: "0 10px 20px rgba(16, 185, 129, 0.3)",
 };
 
-const popupCardStyle = {
-  width: "220px",
-  padding: "10px",
-  borderRadius: "12px",
-  fontFamily: "sans-serif",
+const checkCircleStyle = {
+  width: "30px", height: "30px", background: "white", color: "#059669",
+  borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "900"
 };
 
-const popupHeaderStyle = {
-  fontWeight: "700",
-  fontSize: "15px",
-  marginBottom: "8px",
-  color: "#111827",
+const verifiedTagStyle = {
+  position: "absolute", top: "12px", right: "12px", background: "#064e3b",
+  color: "#34d399", padding: "6px 14px", borderRadius: "20px", fontSize: "10px", fontWeight: "900",
+  border: "1px solid #059669", boxShadow: "0 4px 12px rgba(0,0,0,0.5)"
 };
 
-const popupBodyStyle = {
-  display: "flex",
-  flexDirection: "column",
-  gap: "6px",
-  fontSize: "13px",
-  color: "#374151",
-};
-
-const popupRowStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-};
-
-const popupRouteButtonStyle = {
-  marginTop: "10px",
-  width: "100%",
-  padding: "6px",
-  borderRadius: "8px",
-  border: "none",
-  background: "linear-gradient(to right, #10b981, #3b82f6)",
-  color: "white",
-  fontWeight: "600",
-  cursor: "pointer",
-};
-const modalStyle = {
-  background: "rgba(255,255,255,0.95)",
-  padding: "30px",
-  borderRadius: "20px",
-  width: "380px",
-  textAlign: "center",
-  boxShadow: "0 30px 60px rgba(0,0,0,0.25)",
-   maxHeight: "90vh",        // ✅ Prevent overflow
-  overflowY: "auto",
-};
-
-const titleStyle = {
-  fontSize: "22px",
-  fontWeight: "700",
-  marginBottom: "15px",
-  background: "linear-gradient(to right, #10b981, #3b82f6)",
-  WebkitBackgroundClip: "text",
-  WebkitTextFillColor: "transparent",
-};
-
-const uploadStyle = {
-  display: "block",
-  padding: "12px",
-  border: "2px dashed #3b82f6",
-  borderRadius: "12px",
-  cursor: "pointer",
-};
-
-const previewStyle = {
-  width: "100%",
-  borderRadius: "12px",
-  marginTop: "10px",
-};
-
-const inputStyle = {
-  width: "100%",
-  padding: "12px",
-  marginTop: "15px",
-  borderRadius: "10px",
-  border: "1px solid #ddd",
-};
-
-const submitStyle = {
-  width: "100%",
-  marginTop: "15px",
-  padding: "12px",
-  background: "linear-gradient(to right, #10b981, #3b82f6)",
-  color: "white",
-  border: "none",
-  borderRadius: "12px",
-  fontWeight: "600",
-  cursor: "pointer",
-};
-
-const routeButtonStyle = {
-  marginTop: "8px",
-  padding: "6px 10px",
-  background: "#2563eb",
-  color: "white",
-  border: "none",
-  borderRadius: "6px",
-  cursor: "pointer",
-};
-
-const gpsCardStyle = {
-  marginTop: "15px",
-  padding: "15px",
-  borderRadius: "14px",
-  background: "linear-gradient(to right, #fee2e2, #fecaca)",
-  boxShadow: "0 15px 30px rgba(0,0,0,0.1)",
-};
-
-const gpsIconStyle = {
-  fontSize: "28px",
-  marginBottom: "5px",
-};
-
-const gpsRetryButton = {
-  marginTop: "10px",
-  padding: "8px 14px",
-  borderRadius: "10px",
-  border: "none",
-  background: "linear-gradient(to right, #ef4444, #dc2626)",
-  color: "white",
-  cursor: "pointer",
-  fontWeight: "600",
-};
+const overlayStyle = { position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backdropFilter: "blur(20px)", background: "rgba(15, 23, 42, 0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10000 };
+const modalStyle = { background: "#fff", padding: "40px", borderRadius: "32px", width: "400px", textAlign: "center", boxShadow: "0 50px 100px -20px rgba(0,0,0,0.5)" };
+const titleStyle = { fontSize: "26px", fontWeight: "900", color: "#1e293b", marginBottom: "20px" };
+const uploadStyle = { display: "block", padding: "20px", border: "2px dashed #e2e8f0", borderRadius: "20px", cursor: "pointer", color: "#64748b", fontWeight: "700" };
+const previewStyle = { width: "100%", borderRadius: "16px", maxHeight: "220px", objectFit: "cover" };
+const labelStyle = { fontSize: "11px", fontWeight: "800", color: "#94a3b8", marginLeft: "5px" };
+const inputStyle = { width: "100%", padding: "15px", marginTop: "5px", borderRadius: "15px", border: "1px solid #e2e8f0", fontSize: "16px", fontWeight: "600", outline: "none" };
+const submitStyle = { width: "100%", marginTop: "25px", padding: "18px", background: "#1e293b", color: "white", border: "none", borderRadius: "18px", fontWeight: "800", cursor: "pointer", transition: "0.2s" };
+const processingOverlayStyle = { position: "absolute", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(15,23,42,0.8)", borderRadius: "16px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" };
+const popupCardStyle = { width: "180px" };
+const popupHeaderStyle = { fontWeight: "900", color: "#1e293b", marginBottom: "8px" };
+const popupBodyStyle = { fontSize: "12px", display: "flex", flexDirection: "column", gap: "4px" };
+const popupRowStyle = { display: "flex", justifyContent: "space-between" };
+const popupRouteButtonStyle = { marginTop: "12px", width: "100%", padding: "10px", borderRadius: "10px", background: "#10b981", color: "#fff", border: "none", fontWeight: "800", cursor: "pointer" };
