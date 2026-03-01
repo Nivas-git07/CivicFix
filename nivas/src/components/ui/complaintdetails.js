@@ -10,7 +10,7 @@ const defaultResponse = {
   district: "Madurai Corporation",
   description:
     "Open drainage leakage causing bad smell and mosquito breeding. Needs immediate cleaning and repair.",
-  image: photo , // no base64 by default
+  image: photo , 
   timeline: [
     "Complaint Submitted",
     "Assigned to Sanitation Department",
@@ -19,7 +19,7 @@ const defaultResponse = {
 };
 
 const ComplaintDetails = ({ response }) => {
-  // ✅ Use default if response not available
+
   const data = response || defaultResponse;
 
   return (

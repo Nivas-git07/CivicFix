@@ -9,7 +9,7 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
-/* STORE DATA - Note the keys: plastic, metal, etc. */
+
 const stores = [
   {
     id: 1,
@@ -29,8 +29,8 @@ const stores = [
 
 export default function RecycleSmartMap() {
   const [showModal, setShowModal] = useState(true);
-  const [material, setMaterial] = useState("plastic"); // Default to plastic so rates exist
-  const [weight, setWeight] = useState("1.0"); // Default weight
+  const [material, setMaterial] = useState("plastic"); 
+  const [weight, setWeight] = useState("1.0"); 
   const [userLocation, setUserLocation] = useState(null);
   const [route, setRoute] = useState([]);
   const [imagePreview, setImagePreview] = useState(null);
@@ -58,9 +58,9 @@ export default function RecycleSmartMap() {
     setTimeout(() => {
       setIsProcessing(false);
       setIsVerified(true);
-      // We set a valid key from our 'rates' object
+    
       setMaterial("plastic"); 
-      // Automatically suggests a weight
+    
     }, 1500);
   };
 
@@ -90,7 +90,7 @@ export default function RecycleSmartMap() {
           {userLocation && <Marker position={userLocation}><Popup>You are here 📍</Popup></Marker>}
           
           {!showModal && stores.map((store) => {
-              // Get the specific rate for the selected material
+             
               const currentRate = store.rates[material] || 0;
               const total = (parseFloat(weight) || 0) * currentRate;
               const dist = userLocation ? calculateDistance(userLocation[0], userLocation[1], store.lat, store.lng) : 0;

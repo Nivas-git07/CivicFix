@@ -19,7 +19,7 @@ export default function TrackComplaint() {
     const defaultData = {
       status: "In Progress",
       complaint_id: complaintId,
-      time: "Today, 3:45 PM",
+      time: "Today, 4:10 PM",
       category: "Garbage Overflow",
       last_updated: "10 minutes ago",
       location: "Anna Nagar, Madurai",
