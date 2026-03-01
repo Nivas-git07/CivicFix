@@ -15,17 +15,17 @@ export default function TrackComplaint() {
       return;
     }
 
-    // ✅ Timeline is an array of OBJECTS
+    
     const defaultData = {
       status: "In Progress",
       complaint_id: complaintId,
-      time: "Today, 4:10 PM",
+      time: "Today, 4:13 PM",
       category: "Garbage Overflow",
       last_updated: "10 minutes ago",
       location: "Anna Nagar, Madurai",
       description: "Garbage bins are overflowing near the main road causing bad smell.",
       timeline: [
-        { label: "Complaint Submitted", isCompleted: true, time: "3:45 PM" },
+        { label: "Complaint Submitted", isCompleted: true, time: "4:13 PM" },
         { label: "Assigned to Department", isCompleted: false, time: "Pending" },
         { label: "Cleaning Scheduled", isCompleted: false, time: "Pending" },
       ],

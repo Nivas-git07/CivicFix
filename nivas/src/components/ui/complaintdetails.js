@@ -3,7 +3,7 @@ import photo from "../image/drain.jpeg";
 const defaultResponse = {
   status: "Pending",
   complaint_id: "CIV-2025-001",
-  time: "Today, 2:30 PM",
+  time: "Today, 4:13 PM",
   category: "Drainage Issue",
   last_updated: "—",
   location: "Anna Nagar, Madurai",
