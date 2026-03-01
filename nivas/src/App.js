@@ -15,16 +15,15 @@ function App() {
   return (
    
       <Routes>
-        <Route path="/" element={<SignInPage />} />
+        <Route path="/sign" element={<SignInPage />} />
         <Route path="/register" element={<RegisterPage />} />
-
-        <Route path="/home" element={<Home />} />
+        <Route path="/" element={<Home />} />
         <Route path="/report" element={<ReportForm />} />
         <Route path="/getcomplaint" element={<TrackComplaint />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/mapview" element={<PublicTransparencyMap />} />
-         <Route path="/leaderboard" element={<Leaderboard />}   />
-         <Route path="/recycle" element={<RecycleSmartMap />} />
+        <Route path="/leaderboard" element={<Leaderboard />}   />
+        <Route path="/recycle" element={<RecycleSmartMap />} />
       </Routes>
    
   );
