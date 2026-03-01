@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Content from "./content";
 import photo from "../image/drain.jpeg";
+import porthole from "../image/porthole.jpg";
+import streetlight from "../image/streetlight.png";
 export default function ReportCard() {
   const DEFAULT_COMPLAINTS = [
     {
@@ -14,7 +16,7 @@ export default function ReportCard() {
       like: 2,
       comment: 4,
       issueid: "CIV-101",
-      image: photo,
+      image: porthole,
     },
     {
       id: 2,
@@ -40,7 +42,7 @@ export default function ReportCard() {
       like: 1,
       comment: 2,
       issueid: "CIV-103",
-      image: photo,
+      image: streetlight,
     },
   ];
 
