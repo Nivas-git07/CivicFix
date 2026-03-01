@@ -15,10 +15,10 @@ function App() {
   return (
    
       <Routes>
-        <Route path="/login" element={<SignInPage />} />
+        <Route path="/" element={<SignInPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        <Route path="/" element={<Home />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/report" element={<ReportForm />} />
         <Route path="/getcomplaint" element={<TrackComplaint />} />
         <Route path="/profile" element={<Profile />} />

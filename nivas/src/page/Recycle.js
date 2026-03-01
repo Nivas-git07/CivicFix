@@ -9,7 +9,7 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
-/* STORE DATA */
+/* STORE DATA - Note the keys: plastic, metal, etc. */
 const stores = [
   {
     id: 1,
@@ -23,18 +23,17 @@ const stores = [
     name: "City Scrap Store",
     lat: 9.93,
     lng: 78.125,
-    rates: { plastic: 10, metal: 40, paper: 7, glass: 4, "e-waste": 45 },
+    rates: { plastic: 15, metal: 40, paper: 7, glass: 4, "e-waste": 45 },
   },
 ];
 
 export default function RecycleSmartMap() {
   const [showModal, setShowModal] = useState(true);
-  const [material, setMaterial] = useState("");
-  const [weight, setWeight] = useState("");
+  const [material, setMaterial] = useState("plastic"); // Default to plastic so rates exist
+  const [weight, setWeight] = useState("1.0"); // Default weight
   const [userLocation, setUserLocation] = useState(null);
   const [route, setRoute] = useState([]);
   const [imagePreview, setImagePreview] = useState(null);
-  const [locationError, setLocationError] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
 
@@ -42,7 +41,7 @@ export default function RecycleSmartMap() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => setUserLocation([pos.coords.latitude, pos.coords.longitude]),
-        () => setLocationError("Location permission denied.")
+        () => console.log("Location denied")
       );
     }
   }, []);
@@ -54,15 +53,15 @@ export default function RecycleSmartMap() {
     setImagePreview(URL.createObjectURL(file));
     setIsProcessing(true);
     setIsVerified(false);
-    setMaterial("");
 
-    // SIMULATED VERIFICATION (Doesn't depend on n8n)
+    // SIMULATED AI 
     setTimeout(() => {
       setIsProcessing(false);
       setIsVerified(true);
-      // Default to "Plastic" for the demo, but you can change this
-      setMaterial("Verified"); // Auto-fill a default weight
-    }, 2000);
+      // We set a valid key from our 'rates' object
+      setMaterial("plastic"); 
+      // Automatically suggests a weight
+    }, 1500);
   };
 
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -87,65 +86,60 @@ export default function RecycleSmartMap() {
       <div style={{ height: "100vh", width: "100%" }}>
         <MapContainer center={[9.9252, 78.1198]} zoom={13} style={{ height: "100%", width: "100%" }}>
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          {userLocation && <Marker position={userLocation}><Popup>Your Location 📍</Popup></Marker>}
+          
+          {userLocation && <Marker position={userLocation}><Popup>You are here 📍</Popup></Marker>}
+          
           {!showModal && stores.map((store) => {
-              const rate = store.rates[material] || 0;
-              const distance = userLocation ? calculateDistance(userLocation[0], userLocation[1], store.lat, store.lng) : 0;
+              // Get the specific rate for the selected material
+              const currentRate = store.rates[material] || 0;
+              const total = (parseFloat(weight) || 0) * currentRate;
+              const dist = userLocation ? calculateDistance(userLocation[0], userLocation[1], store.lat, store.lng) : 0;
+              
               return (
                 <Marker key={store.id} position={[store.lat, store.lng]}>
                   <Popup>
                     <div style={popupCardStyle}>
-                      <div style={popupHeaderStyle}>🏪 {store.name}</div>
+                      <div style={popupHeaderStyle}>🏢 {store.name}</div>
                       <div style={popupBodyStyle}>
-                        <div style={popupRowStyle}><span>📍 Distance</span><strong>{distance.toFixed(2)} KM</strong></div>
-                        <div style={popupRowStyle}><span>💰 Rate</span><strong>₹{rate}/kg</strong></div>
-                        <div style={popupRowStyle}><span>🧾 Total</span><strong style={{ color: "#10b981" }}>₹{weight * rate}</strong></div>
+                        <div style={popupRowStyle}><span>📍 Distance:</span><strong>{dist.toFixed(1)} km</strong></div>
+                        <div style={popupRowStyle}><span>🏷️ Rate:</span><strong>₹{currentRate}/kg</strong></div>
+                        <hr style={{margin: '5px 0', border: '0', borderTop: '1px solid #eee'}}/>
+                        <div style={popupRowStyle}><span style={{color: '#66748b'}}>Total Pay:</span><strong style={{ color: "#10b981", fontSize: '15px' }}>₹{total}</strong></div>
                       </div>
-                      <button style={popupRouteButtonStyle} onClick={() => getRoute(store)}>🚗 Show Route</button>
+                      <button style={popupRouteButtonStyle} onClick={() => getRoute(store)}>Direction</button>
                     </div>
                   </Popup>
                 </Marker>
               );
             })}
-          {route.length > 0 && <Polyline positions={route} color="#10b981" weight={6} />}
+          {route.length > 0 && <Polyline positions={route} color="#3b82f6" weight={5} />}
         </MapContainer>
 
         {showModal && (
           <div style={overlayStyle}>
             <div style={modalStyle}>
-              <h2 style={titleStyle}>♻️ Smart Recycler</h2>
+              <h2 style={titleStyle}>Recycle Verification</h2>
 
               <label style={uploadStyle}>
-                {isProcessing ? "🔍 Analyzing..." : "📸 Upload Waste Photo"}
-                <input type="file" style={{ display: "none" }} onChange={handleFileUpload} disabled={isProcessing} />
+                {isProcessing ? "🔄 Verifying..." : "📤 Click to Upload Photo"}
+                <input type="file" style={{ display: "none" }} onChange={handleFileUpload} />
               </label>
 
-              <div style={{ position: "relative", marginTop: "15px" }}>
-                {imagePreview && (
-                  <>
-                    <img src={imagePreview} alt="preview" style={previewStyle} />
-                    {isVerified && (
-                      <div style={verifiedTagStyle}>
-                        <span style={{ marginRight: "5px" }}>🛡️</span> SYSTEM VERIFIED
-                      </div>
-                    )}
-                  </>
-                )}
-                {isProcessing && (
-                  <div style={processingOverlayStyle}>
-                    <div className="spinner"></div>
-                    <p style={{ color: "white", marginTop: "10px", fontWeight: "600" }}>Running AI Diagnostics...</p>
-                  </div>
-                )}
-              </div>
+              {imagePreview && (
+                <div style={{ position: "relative", marginTop: "15px" }}>
+                  <img src={imagePreview} alt="preview" style={previewStyle} />
+                  {isVerified && <div style={verifiedTagStyle}>AI VERIFIED</div>}
+                  {isProcessing && <div style={processingOverlayStyle}><div className="spinner"></div></div>}
+                </div>
+              )}
 
               {isVerified && (
                 <div style={verifiedBadgeStyle}>
-                  <div style={checkCircleStyle}>✓</div>
-                  <div style={{ textAlign: "left" }}>
-                    <span style={{ fontSize: "10px", fontWeight: "800", letterSpacing: "1px" }}>MATCH CONFIRMED</span>
-                    <div style={{ fontSize: "20px", fontWeight: "900", textTransform: "uppercase" }}>{material}</div>
+                  <div style={{textAlign: 'left'}}>
+                    <p style={{fontSize: '10px', margin: 0, fontWeight: 'bold'}}>MATERIAL TYPE</p>
+                    <p style={{fontSize: '22px', margin: 0, fontWeight: '900', textTransform: 'uppercase'}}>{material}</p>
                   </div>
+                  <div style={{fontSize: '30px'}}>🛡️</div>
                 </div>
               )}
 
@@ -156,16 +150,15 @@ export default function RecycleSmartMap() {
                   value={weight}
                   onChange={(e) => setWeight(e.target.value)}
                   style={inputStyle}
-                  placeholder="Estimated weight"
                 />
               </div>
 
               <button
-                style={{ ...submitStyle, opacity: isVerified ? 1 : 0.5 }}
+                style={{ ...submitStyle, background: isVerified ? '#10b981' : '#cbd5e1' }}
                 disabled={!isVerified}
                 onClick={() => setShowModal(false)}
               >
-                {isVerified ? "Find Verified Hubs →" : "Scan Image to Continue"}
+                Find Best Local Rates
               </button>
             </div>
           </div>
@@ -173,44 +166,26 @@ export default function RecycleSmartMap() {
       </div>
 
       <style>{`
-        .spinner { border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid #fff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        .spinner { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
       `}</style>
     </>
   );
 }
 
-/* ================= THEMES & STYLES ================= */
-
-const verifiedBadgeStyle = {
-  marginTop: "15px", padding: "12px 20px", borderRadius: "16px",
-  background: "linear-gradient(135deg, #059669 0%, #10b981 100%)",
-  color: "white", display: "flex", alignItems: "center", gap: "15px",
-  boxShadow: "0 10px 20px rgba(16, 185, 129, 0.3)",
-};
-
-const checkCircleStyle = {
-  width: "30px", height: "30px", background: "white", color: "#059669",
-  borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "900"
-};
-
-const verifiedTagStyle = {
-  position: "absolute", top: "12px", right: "12px", background: "#064e3b",
-  color: "#34d399", padding: "6px 14px", borderRadius: "20px", fontSize: "10px", fontWeight: "900",
-  border: "1px solid #059669", boxShadow: "0 4px 12px rgba(0,0,0,0.5)"
-};
-
-const overlayStyle = { position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backdropFilter: "blur(20px)", background: "rgba(15, 23, 42, 0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10000 };
-const modalStyle = { background: "#fff", padding: "40px", borderRadius: "32px", width: "400px", textAlign: "center", boxShadow: "0 50px 100px -20px rgba(0,0,0,0.5)" };
-const titleStyle = { fontSize: "26px", fontWeight: "900", color: "#1e293b", marginBottom: "20px" };
-const uploadStyle = { display: "block", padding: "20px", border: "2px dashed #e2e8f0", borderRadius: "20px", cursor: "pointer", color: "#64748b", fontWeight: "700" };
-const previewStyle = { width: "100%", borderRadius: "16px", maxHeight: "220px", objectFit: "cover" };
-const labelStyle = { fontSize: "11px", fontWeight: "800", color: "#94a3b8", marginLeft: "5px" };
-const inputStyle = { width: "100%", padding: "15px", marginTop: "5px", borderRadius: "15px", border: "1px solid #e2e8f0", fontSize: "16px", fontWeight: "600", outline: "none" };
-const submitStyle = { width: "100%", marginTop: "25px", padding: "18px", background: "#1e293b", color: "white", border: "none", borderRadius: "18px", fontWeight: "800", cursor: "pointer", transition: "0.2s" };
-const processingOverlayStyle = { position: "absolute", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(15,23,42,0.8)", borderRadius: "16px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" };
-const popupCardStyle = { width: "180px" };
-const popupHeaderStyle = { fontWeight: "900", color: "#1e293b", marginBottom: "8px" };
-const popupBodyStyle = { fontSize: "12px", display: "flex", flexDirection: "column", gap: "4px" };
-const popupRowStyle = { display: "flex", justifyContent: "space-between" };
-const popupRouteButtonStyle = { marginTop: "12px", width: "100%", padding: "10px", borderRadius: "10px", background: "#10b981", color: "#fff", border: "none", fontWeight: "800", cursor: "pointer" };
+const overlayStyle = { position: "fixed", inset: 0, backdropFilter: "blur(10px)", background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10000 };
+const modalStyle = { background: "#fff", padding: "30px", borderRadius: "24px", width: "360px", textAlign: "center", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" };
+const titleStyle = { fontSize: "22px", fontWeight: "800", color: "#1e293b", marginBottom: "20px" };
+const uploadStyle = { display: "block", padding: "20px", border: "2px dashed #e2e8f0", borderRadius: "15px", cursor: "pointer", color: "#64748b" };
+const previewStyle = { width: "100%", borderRadius: "12px", maxHeight: "180px", objectFit: "cover" };
+const verifiedTagStyle = { position: "absolute", top: "10px", right: "10px", background: "#10b981", color: "white", padding: "4px 10px", borderRadius: "8px", fontSize: "10px", fontWeight: "bold" };
+const processingOverlayStyle = { position: "absolute", inset: 0, background: "rgba(0,0,0,0.5)", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "center" };
+const verifiedBadgeStyle = { marginTop: "15px", padding: "15px", borderRadius: "15px", background: "#f0fdf4", border: "1px solid #bbf7d0", color: "#166534", display: "flex", justifyContent: 'space-between', alignItems: 'center' };
+const labelStyle = { fontSize: "11px", fontWeight: "bold", color: "#94a3b8" };
+const inputStyle = { width: "100%", padding: "12px", marginTop: "5px", borderRadius: "10px", border: "1px solid #e2e8f0", fontSize: "16px", outline: "none" };
+const submitStyle = { width: "100%", marginTop: "20px", padding: "15px", color: "white", border: "none", borderRadius: "12px", fontWeight: "bold", cursor: "pointer" };
+const popupCardStyle = { width: "150px" };
+const popupHeaderStyle = { fontWeight: "800", marginBottom: "5px" };
+const popupBodyStyle = { fontSize: "12px" };
+const popupRowStyle = { display: "flex", justifyContent: "space-between", margin: '2px 0' };
+const popupRouteButtonStyle = { marginTop: "10px", width: "100%", padding: "8px", borderRadius: "8px", background: "#3b82f6", color: "#fff", border: "none", cursor: "pointer" };
